@@ -33,8 +33,8 @@ class PhotoBooth:
         self.thumb_size = (1740, 135) # px of thumbnail image
         self.thumb_path = "/home/pi/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
         #File Management
-        self.save_path = "/media/pi/INTENSO/" #/home/pi/Desktop/Pics/
-        self.back_up_path = "/home/pi/Back_up_Booth_Pics"  
+        self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
+        self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  
         try:
             os.mkdir(self.save_path)
         except OSError:
