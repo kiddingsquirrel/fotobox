@@ -200,7 +200,7 @@ class App(cevent.CEvent):
         for image in self._current_window.images.values():
             self._display_surf.blit(image.img, image.location)        
         for button in self._current_window.buttons.values():
-            self._display_surf.blit(b   utton.img, button.location)
+            self._display_surf.blit(button.img, button.location)
 
         pygame.display.flip()
     def on_exit(self):
