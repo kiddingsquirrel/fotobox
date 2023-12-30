@@ -14,6 +14,8 @@ A small python project to run a fotobox on a raspberry pi
   -   printer (teste models: Mitsubishi CP D80, Canon Shelpy CP 1300)
   -   GPIO buttons
   -   LEDs
-
  # Installation
+ - clone the repository
+ - Follow the great turorial of https://www.peachyphotos.com/blog/stories/building-modern-gutenprint/ to install gutenprint
+ - 
  
