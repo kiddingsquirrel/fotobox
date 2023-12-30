@@ -1,0 +1,37 @@
+Before printing is possible you need to do the following things:
+install cups:
+`sudo apt-get install cups`
+then add the pi user to the cups admins the following way:
+`sudo nano /etc/cups/cupsd.conf`
+find the part containing: `<Limit CUPS-Add-Modify-Printer...`
+and add ` pi` to the end of the line `Require user @SYSTEM`
+save and exit and then restart cups:
+```bash
+sudo killall cupsd
+sudo systemctl restart cups
+```
+and open `localhost:631`
+
+To setup the M2026 Printer you need the ppd file here:
+https://gitlab.com/ScumCoder/splix/blob/76268c4dd7dbc8218ea7426401104c3b40cc707a/splix/ppd/m2020.ppd
+
+then add the printer and set it to system default. Also the default printmedia should be A4 Paper
+
+after this setup you are nearly done.
+
+to rotate the screen with touchscreen just use the following two lines at boot:
+```bash
+xrandr -o inverted
+xinput set-prop [id of touchscreen] --type=float [id of CoordTranfMatrix] -1 0 1 0 -1 1 0 0 1
+```
+
+make sure that the cam module is enabled on your pi (check `pi-config` for this)
+and make sure that any USB-stick you mount is mounted under `/media/pi/[Name of the stick]`
+
+finaly you can run the PhotoBooth app within the env with:
+```bash
+cd /[path to PhotoBooth Projekt]
+source booth-env/bin/activate
+python3 Main.py
+```
+
