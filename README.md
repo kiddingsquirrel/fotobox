@@ -9,4 +9,11 @@ A small python project to run a fotobox on a raspberry pi
   -    Display or Touchscreen (test model: )
 - Software:
   -   Raspi-OS legacy 32bit (to support raspicam)
-  -   raspicam 
+  -   pygame (GUI)
+- Optional:
+  -   printer (teste models: Mitsubishi CP D80, Canon Shelpy CP 1300)
+  -   GPIO buttons
+  -   LEDs
+
+ # Installation
+ 
