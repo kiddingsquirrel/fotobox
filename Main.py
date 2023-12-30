@@ -9,7 +9,7 @@ import PhotoBooth
 import time
 import os
 
-
+working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
         self._running = True
@@ -27,7 +27,7 @@ class App(cevent.CEvent):
         self.settings = {"printing":True, "usb":True, "FULLSCREEN":True}  # all settings should reside in this dict
 
     def on_init(self):
-        os.chdir("/home/pi/PhotoBooth-dev_Joni_2023/")
+        os.chdir(working_dictonary)
         pygame.init()
         self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
         self._running = True
@@ -200,13 +200,14 @@ class App(cevent.CEvent):
         for image in self._current_window.images.values():
             self._display_surf.blit(image.img, image.location)        
         for button in self._current_window.buttons.values():
-            self._display_surf.blit(button.img, button.location)
+            self._display_surf.blit(b   utton.img, button.location)
 
         pygame.display.flip()
-
+    def on_exit(self):
+        self._running = False    
     def on_cleanup(self):
         pygame.quit()
-        on_exit()
+        self.on_exit()
 
     def execute(self):
         self.on_init()
@@ -218,8 +219,7 @@ class App(cevent.CEvent):
                     self.on_render()
             self.on_cleanup()
 
-    def on_exit(self):
-        self._running = False
+
 
     def set_print(self):
         self._current_window = self._print_window
