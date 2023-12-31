@@ -97,9 +97,10 @@ class App(cevent.CEvent):
                                                          "style_3")
         
 
-    # def on_event(self, event):
+    #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
+
    
     def printone(self):
         self.set_start()
