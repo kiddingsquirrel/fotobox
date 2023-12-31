@@ -113,6 +113,8 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,60),(300,20),"Zeile 1 - Press Enter"),"Zeile 1")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,100),(300,20),"Zeile 2 - Press Enter"),"Zeile 2")
 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
