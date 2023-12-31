@@ -221,6 +221,11 @@ class App(cevent.CEvent):
             self._display_surf.blit(image.img, image.location)        
         for button in self._current_window.buttons.values():
             self._display_surf.blit(button.img, button.location)
+        for box in self._current_window.inputboxes.values():
+            # Blit the text
+            self._display_surf.blit(box.txt_surface, (box.location))    
+            # Blit the rect
+            pygame.draw.rect(self._display_surf, box.color, box.rect,2)
 
         pygame.display.flip()
     def on_exit(self):
