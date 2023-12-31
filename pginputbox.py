@@ -8,7 +8,7 @@ class InputBox:
                  FONT= pygame.font.Font(None,16)):
         self.location=location
         self.size=size
-        self.rect=pygame.Rect(location[0],location[1],location[0]+size[0],location[1]+size[1])
+        self.rect=pygame.Rect(location[0],location[1],size[0],size[1])
         self.COLOR_INACTIVE=COLOR_INACTIVE
         self.COLOR_ACTIVE=COLOR_ACTIVE
         self.FONT=FONT

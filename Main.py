@@ -114,8 +114,8 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(3,3),"Zeile 1 - Press Enter"),"Zeile 1")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,600),(3,3),"Zeile 2 - Press Enter"),"Zeile 2")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Zeile 1 - Press Enter"),"Zeile 1")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,400),(300,40),"Zeile 2 - Press Enter"),"Zeile 2")
 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -224,7 +224,8 @@ class App(cevent.CEvent):
             self._display_surf.blit(button.img, button.location)
         for box in self._current_window.inputboxes.values():
             # Blit the text
-            self._display_surf.blit(box.txt_surface,box.location)    
+            text_center=box.txt_surface.get_rect(center=(box.size[0]/2,box.size[1]/2))
+            self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
             # Blit the rect
             pygame.draw.rect(self._display_surf, box.color, box.rect,2)
 
