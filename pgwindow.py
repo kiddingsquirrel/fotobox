@@ -21,3 +21,8 @@ class Window:
             if button.over_button(pos):
                 button.event()
                 return
+    def press_inputbox(self, pos):
+        for box in self.inputboxes.values():
+            if box.over_box(pos):
+                box.event()
+                return            

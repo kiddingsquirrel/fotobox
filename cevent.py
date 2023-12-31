@@ -37,6 +37,7 @@ class CEvent:
 
     def on_lbutton_down(self, event):
         self._current_window.press_button(pygame.mouse.get_pos())
+        self._current_window.press_inputbox(pygame.mouse.get_pos())
 
     def on_rbutton_up(self, event):
         pass

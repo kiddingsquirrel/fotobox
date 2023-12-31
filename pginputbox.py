@@ -2,10 +2,13 @@ import pygame
 #pygame.init()
 #screen = pygame.display.set_mode((640,480))
 class InputBox:
-    def __init__(self,location,size,text='Input Text',
+    def __init__(self,location,size,text,event,
                  COLOR_INACTIVE=pygame.Color('lightskyblue3'),
                  COLOR_ACTIVE=pygame.Color('dodgerblue2'),
                  FONT= pygame.font.Font(None,16)):
+        self.location=location
+        self.size=size
+        self.event= event
         self.rect=pygame.Rect(location[0],location[1],location[0]+size[0],location[1]+size[1])
         self.COLOR_INACTIVE=COLOR_INACTIVE
         self.COLOR_ACTIVE=COLOR_ACTIVE
@@ -14,6 +17,11 @@ class InputBox:
         self.text=text
         self.txt_surface = self.FONT.render(text,True,self.color)
         self.active=False
+    def over_box(self, pos):
+        if self.location[0] <= pos[0] <= self.location[0]+self.size[0]:
+            if self.location[1] <= pos[1] <= self.location[1]+self.size[1]:
+                return True
+        return False
     def handle_event(self,event):
         if event.type==pygame.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect
