@@ -49,7 +49,7 @@ class App(cevent.CEvent):
                                                       (0, 0),
                                                       self.open_settings),
                                                       "settings")
-        #s
+        #
         # Adding button to Print Screen
         #
         rely = 45
@@ -106,16 +106,6 @@ class App(cevent.CEvent):
                                                          self.open_setting_thumbnail),
                                                          "Weiter thumbnail")
         # Adding Button and InputTextbox to setting_thumbnail window
-        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
-                                                         self.open_settings), # anchor
-                                                         "back")
-        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (660, 30),  # (x, y) position
-                                                         self.on_cleanup),
-                                                         "exit")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Zeile 1 - Press Enter"),"Zeile 1")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,400),(300,40),"Zeile 2 - Press Enter"),"Zeile 2")
 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -270,6 +260,16 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
     def open_setting_thumbnail(self):
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Zeile 1 - Press Enter"),"Zeile 1")
+        self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
         self._current_window =self._setting_thumbnail
         self.on_render()
 
