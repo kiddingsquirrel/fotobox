@@ -99,10 +99,20 @@ class App(cevent.CEvent):
                                                          (900, 580),  # (x, y) position
                                                          self.style_3), 
                                                          "style_3")
-        #self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
-        #                                                 ),"Weiter thumbnail")
+        # Add Button to get to window setting_thumbnail
+        self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+                                                         (660, 320),  # (x, y) position
+                                                         self.open_setting_thumbnail()
+                                                         ),"Weiter thumbnail")
         # Adding Button and InputTextbox to setting_thumbnail window
-        
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -250,7 +260,9 @@ class App(cevent.CEvent):
     def open_settings(self):
         self._current_window = self._settings_window
         self.on_render()
-
+    def open_setting_thumbnail(self):
+        self._current_window =self._setting_thumbnail
+        self.on_render()
 
 
 if __name__ == "__main__":
