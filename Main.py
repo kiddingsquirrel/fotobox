@@ -5,6 +5,7 @@ import cevent
 import pgwindow
 import pgbutton
 import pgimage
+import pginputbox
 import PhotoBooth
 import time
 import os
@@ -19,6 +20,7 @@ class App(cevent.CEvent):
         self._capture_window = pgwindow.Window(self.size)
         self._print_window = pgwindow.Window(self.size)
         self._settings_window = pgwindow.Window(self.size)
+        self._setting_thumbnail = pgwindow.Window(self.size)
         self._current_window = self._start_window
         self.booth = None
         self.last_montage_path = "temps/collage.jpg"
@@ -95,6 +97,10 @@ class App(cevent.CEvent):
                                                          (900, 580),  # (x, y) position
                                                          self.style_3), 
                                                          "style_3")
+        self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+                                                         ),"Weiter thumbnail")
+        # Adding Button and InputTextbox to setting_thumbnail window
+        self._
         
 
     #def on_event(self, event):

@@ -1,15 +1,11 @@
 import pygame
-
 pygame.init()
 screen = pygame.display.set_mode((640,480))
-
-
-
 class InputBox:
     def __init__(self,location,size,text='Input Text',
                  COLOR_INACTIVE=pygame.Color('lightskyblue3'),
                  COLOR_ACTIVE=pygame.Color('dodgerblue2'),
-                 FONT= pygame.font.Font(None,32)):
+                 FONT= pygame.font.Font(None,16)):
         self.rect=pygame.Rect(location[0],location[1],location[0]+size[0],location[1]+size[1])
         self.COLOR_INACTIVE=COLOR_INACTIVE
         self.COLOR_ACTIVE=COLOR_ACTIVE
@@ -48,8 +44,8 @@ class InputBox:
 def main():
     print("main")
     clock = pygame.time.Clock()
-    input_box1=InputBox((0,0),(100,50),"Zeile 1")
-    input_box2=InputBox((0,70),(100,50),"Zeile 2")
+    input_box1=InputBox((0,0),(200,30),"Zeile 1 - Press Enter to start")
+    input_box2=InputBox((0,40),(200,30),"Zeile 2 - Press Enter to starts")
     input_boxes=[input_box1,input_box2]
     done= False
     while not done:
