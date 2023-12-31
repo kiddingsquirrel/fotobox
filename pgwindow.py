@@ -24,5 +24,9 @@ class Window:
     def press_inputbox(self, pos):
         for box in self.inputboxes.values():
             if box.over_box(pos):
-                box.event()
+                return
+    def input_inputbox(self,key):
+        for box in self.inputboxes.values():
+            if box.active:
+                box.input_text(key)
                 return            

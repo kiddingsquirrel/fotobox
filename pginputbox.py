@@ -2,13 +2,12 @@ import pygame
 #pygame.init()
 #screen = pygame.display.set_mode((640,480))
 class InputBox:
-    def __init__(self,location,size,text,event,
+    def __init__(self,location,size,text,
                  COLOR_INACTIVE=pygame.Color('lightskyblue3'),
                  COLOR_ACTIVE=pygame.Color('dodgerblue2'),
                  FONT= pygame.font.Font(None,16)):
         self.location=location
         self.size=size
-        self.event= event
         self.rect=pygame.Rect(location[0],location[1],location[0]+size[0],location[1]+size[1])
         self.COLOR_INACTIVE=COLOR_INACTIVE
         self.COLOR_ACTIVE=COLOR_ACTIVE
@@ -20,29 +19,22 @@ class InputBox:
     def over_box(self, pos):
         if self.location[0] <= pos[0] <= self.location[0]+self.size[0]:
             if self.location[1] <= pos[1] <= self.location[1]+self.size[1]:
-                return True
-        return False
-    def handle_event(self,event):
-        if event.type==pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable
                 self.active= not self.active
-            else:
-                self.active=False
-            # Change the current color of the input box
-            self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
-        if event.type==pygame.KEYDOWN:
-            if self.active:
-                if event.key == pygame.K_RETURN:
-                    print(self.text)
-                    self.text= ""
-                elif event.key == pygame.K_BACKSPACE:
-                    self.text = self.text[:-1]
-                else:
-                    self.text += event.unicode
-                # Re-render the text.
-                self.txt_surface = self.FONT.render(self.text,True,self.color)
+                self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
+                return True
+        self.active= False  
+        self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
+        return False
+    def input_text(self,key):
+        if key == pygame.K_RETURN:
+            print(self.text)
+            self.text= ""
+        elif event.key == pygame.K_BACKSPACE:
+            self.text = self.text[:-1]
+        else:
+            self.text += event.unicode
+        # Re-render the text.
+        self.txt_surface = self.FONT.render(self.text,True,self.color)
     def draw(self,screen):
         # Blit the text
         screen.blit(self.txt_surface,(self.rect.x+5,self.rect.y+5))
