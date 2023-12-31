@@ -5,12 +5,13 @@ import cevent
 import pgwindow
 import pgbutton
 import pgimage
+pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox
 import PhotoBooth
 import time
 import os
 
-pygame.init() # Necessary to use font libary
+
 working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
