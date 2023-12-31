@@ -98,10 +98,9 @@ class App(cevent.CEvent):
                                                          (900, 580),  # (x, y) position
                                                          self.style_3), 
                                                          "style_3")
-        self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
-                                                         ),"Weiter thumbnail")
+        #self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+        #                                                 ),"Weiter thumbnail")
         # Adding Button and InputTextbox to setting_thumbnail window
-        self._
         
 
     #def on_event(self, event):
