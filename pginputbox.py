@@ -39,15 +39,15 @@ class InputBox:
                 self.text += event.unicode
             # Re-render the text.
             self.txt_surface = self.FONT.render(self.text,True,self.color)
-    def draw(self,screen):
+    def draw(self,surface):
         # Blit the text
-        screen.blit(self.txt_surface,(self.rect.x+5,self.rect.y+5))
+        surface.blit(self.txt_surface,(self.rect.x+5,self.rect.y+5))
         # Blit the rect
-        pygame.draw.rect(screen,self.color,self.rect,2)
+        pygame.draw.rect(surface,self.color,self.rect,2)
     def handle_event(self,event):
         if event.type==pygame.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect
-            if self.rect.collidepoint(even.pos):
+            if self.rect.collidepoint(event.pos):
                 self.active= not self.active
             else:
                 self.active=False

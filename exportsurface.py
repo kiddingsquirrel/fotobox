@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 import pginputbox
-current_surface = pygame.Surface((120,30))
+surface1 = pygame.Surface((120,30))
 screen = pygame.display.set_mode((640,480))
 def main():
     print("main")
@@ -12,6 +12,7 @@ def main():
     done= False
     while not done:
         #print("loop")
+        
         for event in pygame.event.get():
             if event.type== pygame.QUIT:
                 done=True
@@ -19,7 +20,7 @@ def main():
                 box.handle_event(event)
         screen.fill((30,30,30))
         for box in input_boxes:
-            box.draw(screen)        
+            box.draw(screen)
         pygame.display.flip()
         clock.tick(30)
 print("start")
