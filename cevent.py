@@ -13,10 +13,9 @@ class CEvent:
         pass
 
     def on_key_down(self, event):
-        print(event.key)
         if event.key == 27:
             self.on_exit()
-        self._current_window.input_inputbox(event.key)
+        self._current_window.input_inputbox(event)
 
     def on_key_up(self, event):
         pass

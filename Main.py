@@ -28,12 +28,13 @@ class App(cevent.CEvent):
         self.last_montage_path = "temps/collage.jpg"
         self.booth = PhotoBooth.PhotoBooth()
         
-        self.settings = {"printing":True, "usb":True, "FULLSCREEN":True}  # all settings should reside in this dict
+        self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
     def on_init(self):
         os.chdir(working_dictonary)
         pygame.init()
-        self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
+        #self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
+        self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
         self._running = True
         pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
         #
@@ -113,8 +114,8 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,60),(300,20),"Zeile 1 - Press Enter"),"Zeile 1")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,100),(300,20),"Zeile 2 - Press Enter"),"Zeile 2")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(3,3),"Zeile 1 - Press Enter"),"Zeile 1")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,600),(3,3),"Zeile 2 - Press Enter"),"Zeile 2")
 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -223,7 +224,7 @@ class App(cevent.CEvent):
             self._display_surf.blit(button.img, button.location)
         for box in self._current_window.inputboxes.values():
             # Blit the text
-            self._display_surf.blit(box.txt_surface, (box.location))    
+            self._display_surf.blit(box.txt_surface,box.location)    
             # Blit the rect
             pygame.draw.rect(self._display_surf, box.color, box.rect,2)
 

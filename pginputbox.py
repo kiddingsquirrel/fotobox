@@ -17,24 +17,28 @@ class InputBox:
         self.txt_surface = self.FONT.render(text,True,self.color)
         self.active=False
     def over_box(self, pos):
-        if self.location[0] <= pos[0] <= self.location[0]+self.size[0]:
-            if self.location[1] <= pos[1] <= self.location[1]+self.size[1]:
-                self.active= not self.active
-                self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
-                return True
-        self.active= False  
-        self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
-        return False
-    def input_text(self,key):
-        if key == pygame.K_RETURN:
-            print(self.text)
-            self.text= ""
-        elif event.key == pygame.K_BACKSPACE:
-            self.text = self.text[:-1]
+        if self.rect.collidepoint(pos):
+            return True
         else:
-            self.text += event.unicode
-        # Re-render the text.
-        self.txt_surface = self.FONT.render(self.text,True,self.color)
+            return False
+    def status(self,status):
+        print("Change status of", self.text)
+        print(" to",status)
+
+        self.active= status
+        self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
+    def input_text(self,event):
+        # print(event)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                # print(self.text)
+                self.text= ""
+            elif event.key == pygame.K_BACKSPACE:
+                self.text = self.text[:-1]
+            else:
+                self.text += event.unicode
+            # Re-render the text.
+            self.txt_surface = self.FONT.render(self.text,True,self.color)
     def draw(self,screen):
         # Blit the text
         screen.blit(self.txt_surface,(self.rect.x+5,self.rect.y+5))
