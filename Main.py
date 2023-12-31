@@ -102,8 +102,8 @@ class App(cevent.CEvent):
         # Add Button to get to window setting_thumbnail
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
-                                                         self.open_setting_thumbnail()
-                                                         ),"Weiter thumbnail")
+                                                         self.open_setting_thumbnail),
+                                                         "Weiter thumbnail")
         # Adding Button and InputTextbox to setting_thumbnail window
         self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
