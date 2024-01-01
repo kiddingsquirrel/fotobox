@@ -275,7 +275,7 @@ class App(cevent.CEvent):
         # Highlight/ activate the current font button on current screen 
         self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png")
         # Deactivate all other font buttons on current screen 
-        other_keys = {key : value for key, value in self.booth.thumb_fonts.items if key != font_key}
+        other_keys = {key : value for key, value in self.booth.thumb_fonts.items() if key != font_key}
         for key in other_keys:
             self._current_window.buttons[key].update_image("Images/style/Font_"+str(key)+".png")
         self.create_thumb_from_input() 
