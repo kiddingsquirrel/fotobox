@@ -230,7 +230,7 @@ class App(cevent.CEvent):
             self._display_surf.blit(button.img, button.location)
         for box in self._current_window.inputboxes.values():
             # Blit the text
-            text_center=box.txt_surface.get_rect(center=(box.size[0]/2,box.size[1]/2))
+            text_center=box.txt_surface.get_rect(center=(int(box.size[0]/2),int(box.size[1]/2)))
             self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
             # Blit the rect
             pygame.draw.rect(self._display_surf, box.color, box.rect,2)
@@ -276,13 +276,11 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
     def open_style_window(self):
-        print(self.booth.get_thumb_status())
         if self.booth.get_thumb_status() == True:
-            print(self.booth.thumb_size)
-            if self.booth.thumb_size[0] >= 1000:
-                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(int(self.booth.thumb_size[0]/2),int(self.booth.thumb_size[1]/2))),"thumbnail")
+            if self.booth.get_thumb_size()[0] >= 1000:
+                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(int(self.booth.get_thumb_size()[0]/2),int(self.booth.get_thumb_size()[1]/2))),"thumbnail")
             else:
-                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(335,660),self.booth.thumb_size),"thumbnail")  
+                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(335,660),self.booth.get_thumb_size()),"thumbnail")  
             self._style_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
                                                         (525,615),
                                                         (220,38)),
@@ -292,7 +290,6 @@ class App(cevent.CEvent):
         self._current_window =self._style_window
         self.on_render()
     def create_thumb_from_input(self):
-        print("Creat Thumb")
         if self._style_window.inputboxes['Zeile 2'].get_text()=="":
             text= str(self._style_window.inputboxes['Zeile 1'].get_text())
             # print(text)

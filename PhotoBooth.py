@@ -265,7 +265,7 @@ class PhotoBooth:
     def create_thumb(self,text,size,anchor="mm",align="center"):
         font =  self.thumb_font
         fontsize = self.thumb_fontsize
-        self.thumb_img= Image.new(mode="RGBA",size=size,color="gray")
+        self.thumb_img= Image.new(mode="RGBA",size=size,color="black")
         font = ImageFont.truetype(font,fontsize)   
         draw = ImageDraw.Draw(self.thumb_img)
         draw.multiline_text((size[0]/2,size[1]/2),text,anchor=anchor,align=align,font=font, fill="black")

@@ -25,16 +25,11 @@ class InputBox:
         else:
             return False
     def status(self,status):
-        print("Change status of", self.text)
-        print(" to",status)
-
         self.active= status
         self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
     def input_text(self,event):
-        print(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                print("Do Event")
                 self.event()
             elif event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
