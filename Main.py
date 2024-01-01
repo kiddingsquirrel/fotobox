@@ -244,8 +244,11 @@ class App(cevent.CEvent):
         self.booth.style_set(3)
         self._current_window = self._style3_window
         self.on_render()
-    def set_font(self,font):
-        self.booth.thumb_font="/home/fotobox/github/fotobox/Fonts/"+font
+    def set_font(self,font_key):
+        # Adjust the current thumb_font
+        self.booth.thumb_font="/home/fotobox/github/fotobox/Fonts/"+self.booth.thumb_fonts[font_key]
+        # Highlight/ activate the current font_botton and deactived all other font buttons
+        self._current_window.buttons
         self.create_thumb_from_input() 
     def set_font_up(self):
         self.booth.thumb_fontsize +=4
