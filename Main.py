@@ -88,18 +88,7 @@ class App(cevent.CEvent):
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
                                                          "restart")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/style_1.png",
-                                                         (90, 580),  # (x, y) position
-                                                         self.style_1), 
-                                                         "style_1")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/style_2_active.png",
-                                                         (500, 580),  # (x, y) position
-                                                         self.style_2), 
-                                                         "style_2")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/style_3.png",
-                                                         (900, 580),  # (x, y) position
-                                                         self.style_3), 
-                                                         "style_3")
+        
         # Add Button to get to window setting_thumbnail
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
@@ -114,8 +103,22 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._style_window.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
-        self._style_window.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")           
+        self._style_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
+                                                        (560,160),
+                                                        (156,36)),
+                                                        "Drucklayout")
+        self._style_window.add_button(pgbutton.Button("Images/style/style_1.png",
+                                                         (90, 205),  # (x, y) position
+                                                         self.style_1), 
+                                                         "style_1")
+        self._style_window.add_button(pgbutton.Button("Images/style/style_2_active.png",
+                                                         (500, 205),  # (x, y) position
+                                                         self.style_2), 
+                                                         "style_2")
+        self._style_window.add_button(pgbutton.Button("Images/style/style_3.png",
+                                                         (900, 205),  # (x, y) position
+                                                         self.style_3), 
+                                                         "style_3")
         # Adding Button and InputTextbox to setting_thumbnail window
         self._style_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
@@ -125,8 +128,7 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._style_window.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
-        self._style_window.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
+        
         
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -146,43 +148,40 @@ class App(cevent.CEvent):
         self._current_window = self._start_window
     def style_1(self):
         self.booth.style_set(1)
-        self._settings_window.buttons["style_1"] = pgbutton.Button("Images/settings/style_1_active.png",
-                                                         (90, 580),  # (x, y) position
+        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1_active.png",
+                                                         (90, 205),  # (x, y) position
                                                          self.style_1)
-        self._settings_window.buttons["style_2"] = pgbutton.Button("Images/settings/style_2.png",
-                                                         (500, 580),  # (x, y) position
+        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2.png",
+                                                         (500, 205),  # (x, y) position
                                                          self.style_2)
-        self._settings_window.buttons["style_3"] = pgbutton.Button("Images/settings/style_3.png",
-                                                         (900, 580),  # (x, y) position
+        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3.png",
+                                                         (900, 205),  # (x, y) position
                                                          self.style_3)
-        self._print_window.images["Montage"]=pgimage.Image(self.last_montage_path,(140,55),(1000,667))
-        self._current_window = self._settings_window
+        self.open_style_window()
     def style_2(self):
         self.booth.style_set(2)
-        self._settings_window.buttons["style_1"] = pgbutton.Button("Images/settings/style_1.png",
-                                                         (90, 580),  # (x, y) position
+        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1.png",
+                                                         (90, 205),  # (x, y) position
                                                          self.style_1)
-        self._settings_window.buttons["style_2"] = pgbutton.Button("Images/settings/style_2_active.png",
-                                                         (500, 580),  # (x, y) position
+        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2_active.png",
+                                                         (500, 205),  # (x, y) position
                                                          self.style_2)
-        self._settings_window.buttons["style_3"] = pgbutton.Button("Images/settings/style_3.png",
-                                                         (900, 580),  # (x, y) position
+        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3.png",
+                                                         (900, 205),  # (x, y) position
                                                          self.style_3)
-        self._print_window.images["Montage"]=pgimage.Image(self.last_montage_path,(140,55),(1000,667))
-        self._current_window = self._settings_window
+        self.open_style_window()
     def style_3(self):
         self.booth.style_set(3)
-        self._settings_window.buttons["style_1"] = pgbutton.Button("Images/settings/style_1.png",
-                                                         (90, 580),  # (x, y) position
+        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1.png",
+                                                         (90, 205),  # (x, y) position
                                                          self.style_1)
-        self._settings_window.buttons["style_2"] = pgbutton.Button("Images/settings/style_2.png",
-                                                         (500, 580),  # (x, y) position
+        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2.png",
+                                                         (500, 205),  # (x, y) position
                                                          self.style_2)
-        self._settings_window.buttons["style_3"] = pgbutton.Button("Images/settings/style_3_active.png",
-                                                         (900, 580),  # (x, y) position
+        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3_active.png",
+                                                         (900, 205),  # (x, y) position
                                                          self.style_3)
-        self._print_window.images["Montage"]=pgimage.Image(self.last_montage_path,(540,55),(222,667))
-        self._current_window = self._settings_window
+        self.open_style_window()
     def change_usb(self):
         oldb = self._settings_window.buttons["usb"]
         if self.settings["usb"]:
@@ -277,7 +276,19 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
     def open_style_window(self):
-        self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")         
+        print(self.booth.get_thumb_status())
+        if self.booth.get_thumb_status() == True:
+            print(self.booth.thumb_size)
+            if self.booth.thumb_size[0] >= 1000:
+                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(int(self.booth.thumb_size[0]/2),int(self.booth.thumb_size[1]/2))),"thumbnail")
+            else:
+                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(335,660),self.booth.thumb_size),"thumbnail")  
+            self._style_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
+                                                        (525,615),
+                                                        (220,38)),
+                                                        "Thumbnaildesign")
+            self._style_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"Start",self.create_thumb_from_input),"Zeile 1")
+            self._style_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2")    
         self._current_window =self._style_window
         self.on_render()
     def create_thumb_from_input(self):

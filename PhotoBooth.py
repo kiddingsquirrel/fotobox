@@ -34,10 +34,6 @@ class PhotoBooth:
         self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
         self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
         self.thumb_fontsize = 50 
-
-
-
-        
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #File Management
@@ -50,7 +46,10 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-    
+    def get_thumb_status(self):
+        return self.thumb
+    def get_thumb_size(self):
+        return self.thumb_size
     def style_set(self,style):
         if style == 1: #4Bilder + Thumbnail - 4x6*2 Paper Slipe
             # Image Capturing
