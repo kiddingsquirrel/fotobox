@@ -105,7 +105,7 @@ class App(cevent.CEvent):
                                                          (660, 320),  # (x, y) position
                                                          self.open_setting_thumbnail),
                                                          "Weiter thumbnail")
-        
+                
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -265,10 +265,7 @@ class App(cevent.CEvent):
                                                          self.on_cleanup),
                                                          "exit")
         self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
-        print(self._setting_thumbnail.inputboxes)
-        print(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
         self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
-        print(self.booth.thumb_path)
         self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
         self._current_window =self._setting_thumbnail
         self.on_render()
