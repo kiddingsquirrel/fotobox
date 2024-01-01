@@ -105,8 +105,7 @@ class App(cevent.CEvent):
                                                          (660, 320),  # (x, y) position
                                                          self.open_setting_thumbnail),
                                                          "Weiter thumbnail")
-        # Adding Button and InputTextbox to setting_thumbnail window
-
+        
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -183,7 +182,6 @@ class App(cevent.CEvent):
                 self.booth.save_path = "/media/pi/{}/Pics/".format(usb_name)
                 None
         self._current_window = self._start_window
-    
     def cam_preview(self):
         self.booth.cam_preview()
         self._current_window = self._settings_window
@@ -200,12 +198,9 @@ class App(cevent.CEvent):
             self._settings_window.buttons["printing"] = pgbutton.Button("Images/settings/PrintingOff.png",
                                                          oldb.location,  # (x, y) position
                                                          self.change_usb)
-        self._current_window = self._start_window
-
-    
+        self._current_window = self._start_window  
     def on_loop(self):
         pass
-
     def on_render(self):
         self._display_surf.fill((0, 0, 0))  # clear all img
         for image in self._current_window.images.values():
@@ -260,6 +255,7 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
     def open_setting_thumbnail(self):
+        # Adding Button and InputTextbox to setting_thumbnail window
         self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
                                                          self.open_settings), # anchor
@@ -268,12 +264,24 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Zeile 1 - Press Enter"),"Zeile 1")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
+        print(self._setting_thumbnail.inputboxes)
+        print(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
         self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
         self._current_window =self._setting_thumbnail
         self.on_render()
-
-
+    def create_thumb_from_input(self):
+        print("Creat Thumb")
+        if self._setting_thumbnail.inputboxes['Zeile 2'].get_text()=="":
+            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
+            print(text)
+        else:
+            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._setting_thumbnail.inputboxes['Zeile 2'].get_text())
+            print(text)
+        self.booth.create_thumb(text)
+        self._setting_thumbnail.images["thumbnail"].update(self._setting_thumbnail.images["thumbnail"].path)
+        self.on_render()
 if __name__ == "__main__":
     theApp = App()
     theApp.execute()

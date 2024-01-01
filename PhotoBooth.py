@@ -258,9 +258,10 @@ class PhotoBooth:
         print(line)
         os.system(line)  # -o media=Custom.7.4x21.0cm
     def create_thumb(self,text,fontsize=50,font="Oswald/Oswald-VariableFont_wght.ttf",anchor="mm",align="center"):
-        self.thumb_img= Image.new(mode="RGBA",size=self.thumb_size)
+        self.thumb_img= Image.new(mode="RGBA",size=self.thumb_size,color="gray")
         font = ImageFont.truetype(font,fontsize)   
-        draw = ImageDraw.Draw(self.img)
-        draw.multiline_text((self.thumb_size[0]/2,self.thumb_size[1]/2),text,anchor=anchor,align=align,font=font)
-        self.thumb_img.save(self.thumb_path)  
+        draw = ImageDraw.Draw(self.thumb_img)
+        draw.multiline_text((self.thumb_size[0]/2,self.thumb_size[1]/2),text,anchor=anchor,align=align,font=font, fill="black")
+        self.thumb_img.save(self.thumb_path)
+        print("saved new thumb to", self.thumb_path)  
 

@@ -2,7 +2,7 @@ import pygame
 #pygame.init()
 #screen = pygame.display.set_mode((640,480))
 class InputBox:
-    def __init__(self,location,size,text,
+    def __init__(self,location,size,text,event,
                  COLOR_INACTIVE=pygame.Color('lightskyblue3'),
                  COLOR_ACTIVE=pygame.Color('dodgerblue2'),
                  FONT= pygame.font.Font(None,16)):
@@ -16,6 +16,9 @@ class InputBox:
         self.text=text
         self.txt_surface = self.FONT.render(text,True,self.color)
         self.active=False
+        self.event= event
+    def get_text(self):
+        return self.text
     def over_box(self, pos):
         if self.rect.collidepoint(pos):
             return True
@@ -28,11 +31,11 @@ class InputBox:
         self.active= status
         self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
     def input_text(self,event):
-        # print(event)
+        print(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                # print(self.text)
-                self.text= ""
+                print("Do Event")
+                self.event()
             elif event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
             else:
@@ -55,8 +58,7 @@ class InputBox:
         if event.type ==  pygame.KEYDOWN:
             if self.active:
                 if event.key== pygame.K_RETURN:
-                    print(self.text)
-                    self.text=""
+                    self.event()
                 elif event.key == pygame.K_BACKSPACE:
                     self.text= self.text[:-1]
                 else:
