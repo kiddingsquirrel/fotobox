@@ -219,7 +219,14 @@ class PhotoBooth:
                 im = images[im_number]
                 im = im.resize((self.pic_size[0], self.pic_size[1]))
                 #flipped = im.tranself.thumb_fontsizespose(method=Image.ROTATE_180)
-                #new_im.paste(flipped, (0, int(y_off)))
+                #new_im.paste(flipped, (0, int(y_off)))self._style1_window.add_image(pgimage.Image("Images/style/Zeile1.png",
+                                                    (90,840),
+                                                    (95,35)),
+                                                    "Zeile 1")
+        self._style1_window.add_image(pgimage.Image("Images/style/Zeile2.png",
+                                                    (90,910),
+                                                    (95,35)),
+                                                    "Zeile 2") 
                 new_im.paste(im, (int(x_off), int(y_off)))
                 x_off += self.x_space + im.size[0]
                 im_number +=1

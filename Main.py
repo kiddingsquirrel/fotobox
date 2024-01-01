@@ -124,8 +124,24 @@ class App(cevent.CEvent):
                                                         (220,38)),
                                                         "Thumbnaildesign")
         self._style1_window.add_image(pgimage.Image(self.booth.thumb_2x2_path,(205,660),(870,68)),"thumbnail")
-        self._style1_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),"Zeile 1")
-        self._style1_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2")   
+        self._style1_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),'Zeile 1')
+        self._style1_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),'Zeile 2')
+        self._style1_window.add_image(pgimage.Image("Images/style/Zeile1.png",
+                                                    (90,840),
+                                                    (95,35)),
+                                                    "Text Zeile 1")
+        self._style1_window.add_image(pgimage.Image("Images/style/Zeile2.png",
+                                                    (90,910),
+                                                    (95,35)),
+                                                    "Text Zeile 2")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
+                                                       (650, 840),  # (x, y) position
+                                                       self.set_font_up), 
+                                                       "Font Up")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
+                                                         (650, 910),  # (x, y) position
+                                                         self.set_font_down), 
+                                                         "Font Down")     
         
         # Style2 Screen - Adding Buttond and InputTextboxes
         self._style2_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -184,11 +200,28 @@ class App(cevent.CEvent):
         self._style3_window.add_image(pgimage.Image(self.booth.thumb_4x1_path,(335,660),self.booth.thumb_4x1_size),"thumbnail")
         self._style3_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),"Zeile 1")
         self._style3_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2") 
+        self._style3_window.add_image(pgimage.Image("Images/style/Zeile1.png",
+                                                    (90,840),
+                                                    (95,35)),
+                                                    "Zeile 1")
+        self._style3_window.add_image(pgimage.Image("Images/style/Zeile2.png",
+                                                    (90,910),
+                                                    (95,35)),
+                                                    "Zeile 2")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
+                                                       (650, 840),  # (x, y) position
+                                                       self.set_font_up), 
+                                                       "Font Up")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
+                                                         (650, 910),  # (x, y) position
+                                                         self.set_font_down), 
+                                                         "Font Down")    
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
 
-   
+    def dummy(self):
+        pass
     def printone(self):
         self.set_start()
         self.booth.print_montage("temps/collage.jpg")
@@ -211,6 +244,15 @@ class App(cevent.CEvent):
         self.booth.style_set(3)
         self._current_window = self._style3_window
         self.on_render()
+    def set_font(self,font):
+        self.booth.thumb_font="/home/fotobox/github/fotobox/Fonts/"+font
+        self.create_thumb_from_input() 
+    def set_font_up(self):
+        self.booth.thumb_fontsize +=4
+        self.create_thumb_from_input()
+    def set_font_down(self):
+        self.booth.thumb_fontsize -=4
+        self.create_thumb_from_input()
     def change_usb(self):
         oldb = self._settings_window.buttons["usb"]
         if self.settings["usb"]:
@@ -280,9 +322,6 @@ class App(cevent.CEvent):
                     self.on_loop()
                     self.on_render()
             self.on_cleanup()
-
-
-
     def set_print(self):
         self._current_window = self._print_window
 
@@ -305,13 +344,13 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
     def create_thumb_from_input(self):
-        if self._current_window.inputboxes['Zeile 2'].get_text()=="":
-            text= str(self._current_window.inputboxes['Zeile 1'].get_text())
-            
+        window=self._current_window
+        if window.inputboxes['Zeile 2'].get_text()=="":
+            text= str(window.inputboxes['Zeile 1'].get_text()) 
         else:
-            text= str(self._current_window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._current_window.inputboxes['Zeile 2'].get_text())
+            text= str(window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(window.inputboxes['Zeile 2'].get_text())
         self.booth.create_thumb(text,self.booth.get_thumb_size())
-        self._current_window.images["thumbnail"].update(self._current_window.images["thumbnail"].path)
+        self._current_window.images["thumbnail"].update(window.images["thumbnail"].path)
         self.on_render()
 if __name__ == "__main__":
     theApp = App()
