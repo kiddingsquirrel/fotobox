@@ -268,6 +268,7 @@ class App(cevent.CEvent):
         print(self._setting_thumbnail.inputboxes)
         print(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
         self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
+        print(self.booth.thumb_path)
         self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
         self._current_window =self._setting_thumbnail
         self.on_render()
@@ -275,11 +276,13 @@ class App(cevent.CEvent):
         print("Creat Thumb")
         if self._setting_thumbnail.inputboxes['Zeile 2'].get_text()=="":
             text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
-            print(text)
+            # print(text)
         else:
             text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._setting_thumbnail.inputboxes['Zeile 2'].get_text())
-            print(text)
-        self.booth.create_thumb(text)
+            # print(text)
+        self.booth.create_thumb(text,self.booth.thumb_size
+        
+        )
         self._setting_thumbnail.images["thumbnail"].update(self._setting_thumbnail.images["thumbnail"].path)
         self.on_render()
 if __name__ == "__main__":
