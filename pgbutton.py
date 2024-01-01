@@ -5,10 +5,11 @@ class Button:
     def __init__(self, path, location, event, y_align='top', x_align='left'):            
         self.img = pygame.image.load(path)
         self.location = [location[0], location[1]]
+        self.size = self.img.get_size()
         if y_align == 'center':
-            self.location[1] = location[1]-self.img.get_size()[1]/2
+            self.location[1] = location[1]-self.size[1]/2
         if x_align == 'center':
-            self.location[0] = location[0]-self.img.get_size()[0]/2
+            self.location[0] = location[0]-self.size[0]/2
         self.event = event
     def update_image(self,path):
         self.img = pygame.image.load(path)

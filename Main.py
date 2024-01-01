@@ -141,7 +141,32 @@ class App(cevent.CEvent):
         self._style1_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
                                                          (650, 910),  # (x, y) position
                                                          self.set_font_down), 
-                                                         "Font Down")     
+                                                         "Font Down")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
+                                                         (740, 840),  # (x, y) position
+                                                         lambda: self.set_font("Oswald")), 
+                                                         "Oswald")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
+                                                         (920, 840),  # (x, y) position
+                                                         lambda: self.set_font("Bentham")), 
+                                                         "Bentham")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
+                                                         (1100, 840),  # (x, y) position
+                                                         lambda: self.set_font("Flaemisch")), 
+                                                         "Flaemisch")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
+                                                         (740, 910),  # (x, y) position
+                                                         lambda: self.set_font("Lora")), 
+                                                         "Lora")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
+                                                         (920, 910),  # (x, y) position
+                                                         lambda: self.set_font("Linux")), 
+                                                         "Linux")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
+                                                         (1100, 910),  # (x, y) position
+                                                         lambda: self.set_font("Great")), 
+                                                         "Great")                                                         
+               
         
         # Style2 Screen - Adding Buttond and InputTextboxes
         self._style2_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -247,8 +272,12 @@ class App(cevent.CEvent):
     def set_font(self,font_key):
         # Adjust the current thumb_font
         self.booth.thumb_font="/home/fotobox/github/fotobox/Fonts/"+self.booth.thumb_fonts[font_key]
-        # Highlight/ activate the current font_botton and deactived all other font buttons
-        self._current_window.buttons
+        # Highlight/ activate the current font button on current screen 
+        self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png")
+        # Deactivate all other font buttons on current screen 
+        other_keys = {key : value for key, value in self.booth.thumb_fonts.items if key != font_key}
+        for key in other_keys:
+            self._current_window.buttons[key].update_image("Images/style/Font_"+str(key)+".png")
         self.create_thumb_from_input() 
     def set_font_up(self):
         self.booth.thumb_fontsize +=4

@@ -103,7 +103,7 @@ class PhotoBooth:
             self.thumb = False  # Is there a thumbnail
         if style == 3: # 4 Bilder + Thumbnail - 2x6*2 Paper Slipe
             # Image Capturing
-            self.resolution = (2340,1523) # px(width,height)  capturing
+            self.resolution = (2340,1523) #self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png") px(width,height)  capturing
             self.pic_size = (530,350)   # px(width,height) on montage
             # Printing 
             self.printer ="D80_2x6x2" #Name of the printer
