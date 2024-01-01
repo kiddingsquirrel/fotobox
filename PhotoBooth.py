@@ -38,7 +38,12 @@ class PhotoBooth:
         self.thumb_size = self.thumb_4x1_size
         self.thumb_path = self.thumb_4x1_path
         
-        
+        self.thumb_fonts = {'Oswald':'Oswald/Oswald-VariableFont_wght.ttf',
+                            'Bentham':'Bentham/Bentham-Regular.ttf',
+                            'Flaemisch':'flaemische-kanzleischrift/Flaemische Kanzleischrift.ttf',
+                            'Lora':'Lora-VariableFont_wght.ttf',
+                            'Linux':'linux_biolinum/LinBiolinum_R.ttf',
+                            'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
         self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
         self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
@@ -220,13 +225,6 @@ class PhotoBooth:
                 im = im.resize((self.pic_size[0], self.pic_size[1]))
                 #flipped = im.tranself.thumb_fontsizespose(method=Image.ROTATE_180)
                 #new_im.paste(flipped, (0, int(y_off)))self._style1_window.add_image(pgimage.Image("Images/style/Zeile1.png",
-                                                    (90,840),
-                                                    (95,35)),
-                                                    "Zeile 1")
-        self._style1_window.add_image(pgimage.Image("Images/style/Zeile2.png",
-                                                    (90,910),
-                                                    (95,35)),
-                                                    "Zeile 2") 
                 new_im.paste(im, (int(x_off), int(y_off)))
                 x_off += self.x_space + im.size[0]
                 im_number +=1
