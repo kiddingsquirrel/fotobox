@@ -41,7 +41,7 @@ class PhotoBooth:
         self.thumb_fonts = {'Oswald':'Oswald/Oswald-VariableFont_wght.ttf',
                             'Bentham':'Bentham/Bentham-Regular.ttf',
                             'Flaemisch':'flaemische-kanzleischrift/Flaemische Kanzleischrift.ttf',
-                            'Lora':'Lora-VariableFont_wght.ttf',
+                            'Lora':'Lora/Lora-VariableFont_wght.ttf',
                             'Linux':'linux_biolinum/LinBiolinum_R.ttf',
                             'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
         self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
