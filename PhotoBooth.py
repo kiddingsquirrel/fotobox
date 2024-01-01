@@ -30,8 +30,15 @@ class PhotoBooth:
         self.y_space = 25
         self.y_offset= 25
         self.thumb = False  # Is there a thumbnail
-        self.thumb_size = (1740, 135) # px of thumbnail image
-        self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+        self.thumb_4x1_path= "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"
+        self.thumb_4x1_size= (600, 135) 
+        self.thumb_2x2_path= "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"
+        self.thumb_2x2_size= (1740, 135) 
+
+        self.thumb_size = self.thumb_4x1_size
+        self.thumb_path = self.thumb_4x1_path
+        
+        
         self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
         self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
@@ -249,15 +256,7 @@ class PhotoBooth:
 
     def print_montage(self, dest_file):
         img = Image.open(dest_file)
-        img_print = Image.new("RGB", self.paper_format, color=(255,255,255))
-        y_off=0
-        for row in range(0,self.print_rows,1):
-            colum=0
-            x_off=0
-            for colum in range(0,self.print_colums,1):
-                img_print.paste(img,(int(x_off),int(y_off)))
-                x_off += img.size[0]
-            y_off += img.size[1]
+        img_print = Ielf._style1_window = pgwindow.Window(self.size).img.size[1]
         img_print.save("temps/print_tmp.png")
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
@@ -265,7 +264,7 @@ class PhotoBooth:
     def create_thumb(self,text,size,anchor="mm",align="center"):
         font =  self.thumb_font
         fontsize = self.thumb_fontsize
-        self.thumb_img= Image.new(mode="RGBA",size=size,color="black")
+        self.thumb_img= Image.new(mode="RGBA",size=size,color="white")
         font = ImageFont.truetype(font,fontsize)   
         draw = ImageDraw.Draw(self.thumb_img)
         draw.multiline_text((size[0]/2,size[1]/2),text,anchor=anchor,align=align,font=font, fill="black")

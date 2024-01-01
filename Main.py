@@ -22,12 +22,12 @@ class App(cevent.CEvent):
         self._capture_window = pgwindow.Window(self.size)
         self._print_window = pgwindow.Window(self.size)
         self._settings_window = pgwindow.Window(self.size)
-        self._style_window = pgwindow.Window(self.size)
+        self._style1_window = pgwindow.Window(self.size)
+        self._style2_window = pgwindow.Window(self.size)
+        self._style3_window = pgwindow.Window(self.size)
         self._current_window = self._start_window
-        self.booth = None
-        self.last_montage_path = "temps/collage.jpg"
         self.booth = PhotoBooth.PhotoBooth()
-        
+        self.last_montage_path = "temps/collage.jpg"
         self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
     def on_init(self):
@@ -88,48 +88,102 @@ class App(cevent.CEvent):
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
                                                          "restart")
-        
-        # Add Button to get to window setting_thumbnail
+        ## Has to be adjusted
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
-                                                         self.open_style_window),
+                                                         self.open_style_1_window),
                                                          "Weiter thumbnail")
-        # Style Screen - Adding Buttond and InputTextboxes
-        self._style_window.add_button(pgbutton.Button("Images/settings/Back.png",
+        
+        # Style1 Screen - Adding Buttond and InputTextboxes
+        self._style1_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
-        self._style_window.add_button(pgbutton.Button("Images/settings/close.png",
+        self._style1_window.add_button(pgbutton.Button("Images/settings/close.png",
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._style_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
+        self._style1_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
                                                         (560,160),
                                                         (156,36)),
                                                         "Drucklayout")
-        self._style_window.add_button(pgbutton.Button("Images/style/style_1.png",
+        self._style1_window.add_button(pgbutton.Button("Images/style/style_1_active.png",
                                                          (90, 205),  # (x, y) position
-                                                         self.style_1), 
+                                                         self.open_style_1_window), 
                                                          "style_1")
-        self._style_window.add_button(pgbutton.Button("Images/style/style_2_active.png",
+        self._style1_window.add_button(pgbutton.Button("Images/style/style_2.png",
                                                          (500, 205),  # (x, y) position
-                                                         self.style_2), 
+                                                         self.open_style_2_window), 
                                                          "style_2")
-        self._style_window.add_button(pgbutton.Button("Images/style/style_3.png",
+        self._style1_window.add_button(pgbutton.Button("Images/style/style_3.png",
                                                          (900, 205),  # (x, y) position
-                                                         self.style_3), 
+                                                         self.open_style_3_window), 
                                                          "style_3")
-        # Adding Button and InputTextbox to setting_thumbnail window
-        self._style_window.add_button(pgbutton.Button("Images/settings/Back.png",
+        self._style1_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
+                                                        (525,615),
+                                                        (220,38)),
+                                                        "Thumbnaildesign")
+        self._style1_window.add_image(pgimage.Image(self.booth.thumb_2x2_path,(205,660),(870,68)),"thumbnail")
+        self._style1_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),"Zeile 1")
+        self._style1_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2")   
+        
+        # Style2 Screen - Adding Buttond and InputTextboxes
+        self._style2_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
-        self._style_window.add_button(pgbutton.Button("Images/settings/close.png",
+        self._style2_window.add_button(pgbutton.Button("Images/settings/close.png",
+                                                     (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
+        self._style2_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
+                                                        (560,160),
+                                                        (156,36)),
+                                                        "Drucklayout")
+        self._style2_window.add_button(pgbutton.Button("Images/style/style_1.png",
+                                                         (90, 205),  # (x, y) position
+                                                         self.open_style_1_window), 
+                                                         "style_1")
+        self._style2_window.add_button(pgbutton.Button("Images/style/style_2_active.png",
+                                                         (500, 205),  # (x, y) position
+                                                         self.open_style_2_window), 
+                                                         "style_2")
+        self._style2_window.add_button(pgbutton.Button("Images/style/style_3.png",
+                                                         (900, 205),  # (x, y) position
+                                                         self.open_style_3_window), 
+                                                         "style_3")   
+        # Style1 Screen - Adding Buttond and InputTextboxes
+        self._style3_window.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._style3_window.add_button(pgbutton.Button("Images/settings/close.png",
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        
-        
+        self._style3_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
+                                                        (560,160),
+                                                        (156,36)),
+                                                        "Drucklayout")
+        self._style3_window.add_button(pgbutton.Button("Images/style/style_1.png",
+                                                         (90, 205),  # (x, y) position
+                                                         self.open_style_1_window), 
+                                                         "style_1")
+        self._style3_window.add_button(pgbutton.Button("Images/style/style_2.png",
+                                                         (500, 205),  # (x, y) position
+                                                         self.open_style_2_window), 
+                                                         "style_2")
+        self._style3_window.add_button(pgbutton.Button("Images/style/style_3_active.png",
+                                                         (900, 205),  # (x, y) position
+                                                         self.open_style_3_window), 
+                                                         "style_3")
+        self._style3_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
+                                                        (525,615),
+                                                        (220,38)),
+                                                        "Thumbnaildesign")
+        self._style3_window.add_image(pgimage.Image(self.booth.thumb_4x1_path,(335,660),self.booth.thumb_4x1_size),"thumbnail")
+        self._style3_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),"Zeile 1")
+        self._style3_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2") 
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -138,7 +192,6 @@ class App(cevent.CEvent):
     def printone(self):
         self.set_start()
         self.booth.print_montage("temps/collage.jpg")
-
     def printtwo(self):
         self.set_start()
         self.booth.print_file("temps/collage.jpg")
@@ -146,42 +199,18 @@ class App(cevent.CEvent):
     def printer_restart(self):
         self.booth.printer_restart()
         self._current_window = self._start_window
-    def style_1(self):
+    def open_style_1_window(self):
         self.booth.style_set(1)
-        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1_active.png",
-                                                         (90, 205),  # (x, y) position
-                                                         self.style_1)
-        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2.png",
-                                                         (500, 205),  # (x, y) position
-                                                         self.style_2)
-        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3.png",
-                                                         (900, 205),  # (x, y) position
-                                                         self.style_3)
-        self.open_style_window()
-    def style_2(self):
+        self._current_window = self._style1_window
+        self.on_render()
+    def open_style_2_window(self):
         self.booth.style_set(2)
-        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1.png",
-                                                         (90, 205),  # (x, y) position
-                                                         self.style_1)
-        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2_active.png",
-                                                         (500, 205),  # (x, y) position
-                                                         self.style_2)
-        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3.png",
-                                                         (900, 205),  # (x, y) position
-                                                         self.style_3)
-        self.open_style_window()
-    def style_3(self):
+        self._current_window = self._style2_window
+        self.on_render()
+    def open_style_3_window(self):
         self.booth.style_set(3)
-        self._style_window.buttons['style_1']=pgbutton.Button("Images/style/style_1.png",
-                                                         (90, 205),  # (x, y) position
-                                                         self.style_1)
-        self._style_window.buttons['style_2']=pgbutton.Button("Images/style/style_2.png",
-                                                         (500, 205),  # (x, y) position
-                                                         self.style_2)
-        self._style_window.buttons['style_3']=pgbutton.Button("Images/style/style_3_active.png",
-                                                         (900, 205),  # (x, y) position
-                                                         self.style_3)
-        self.open_style_window()
+        self._current_window = self._style3_window
+        self.on_render()
     def change_usb(self):
         oldb = self._settings_window.buttons["usb"]
         if self.settings["usb"]:
@@ -275,31 +304,14 @@ class App(cevent.CEvent):
     def open_settings(self):
         self._current_window = self._settings_window
         self.on_render()
-    def open_style_window(self):
-        if self.booth.get_thumb_status() == True:
-            if self.booth.get_thumb_size()[0] >= 1000:
-                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(int(self.booth.get_thumb_size()[0]/2),int(self.booth.get_thumb_size()[1]/2))),"thumbnail")
-            else:
-                self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(335,660),self.booth.get_thumb_size()),"thumbnail")  
-            self._style_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
-                                                        (525,615),
-                                                        (220,38)),
-                                                        "Thumbnaildesign")
-            self._style_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"Start",self.create_thumb_from_input),"Zeile 1")
-            self._style_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2")    
-        self._current_window =self._style_window
-        self.on_render()
     def create_thumb_from_input(self):
-        if self._style_window.inputboxes['Zeile 2'].get_text()=="":
-            text= str(self._style_window.inputboxes['Zeile 1'].get_text())
-            # print(text)
+        if self._current_window.inputboxes['Zeile 2'].get_text()=="":
+            text= str(self._current_window.inputboxes['Zeile 1'].get_text())
+            
         else:
-            text= str(self._style_window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._style_window.inputboxes['Zeile 2'].get_text())
-            # print(text)
-        self.booth.create_thumb(text,self.booth.thumb_size
-        
-        )
-        self._style_window.images["thumbnail"].update(self._style_window.images["thumbnail"].path)
+            text= str(self._current_window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._current_window.inputboxes['Zeile 2'].get_text())
+        self.booth.create_thumb(text,self.booth.get_thumb_size())
+        self._current_window.images["thumbnail"].update(self._current_window.images["thumbnail"].path)
         self.on_render()
 if __name__ == "__main__":
     theApp = App()
