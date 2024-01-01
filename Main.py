@@ -134,6 +134,7 @@ class App(cevent.CEvent):
                                                     (90,910),
                                                     (95,35)),
                                                     "Text Zeile 2")
+        ## Font Management 
         self._style1_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
                                                        (650, 840),  # (x, y) position
                                                        self.set_font_up), 
@@ -240,7 +241,40 @@ class App(cevent.CEvent):
         self._style3_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
                                                          (650, 910),  # (x, y) position
                                                          self.set_font_down), 
-                                                         "Font Down")    
+                                                         "Font Down")
+        ## Font Management 
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
+                                                       (650, 840),  # (x, y) position
+                                                       self.set_font_up), 
+                                                       "Font Up")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
+                                                         (650, 910),  # (x, y) position
+                                                         self.set_font_down), 
+                                                         "Font Down")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
+                                                         (740, 840),  # (x, y) position
+                                                         lambda: self.set_font("Oswald")), 
+                                                         "Oswald")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
+                                                         (920, 840),  # (x, y) position
+                                                         lambda: self.set_font("Bentham")), 
+                                                         "Bentham")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
+                                                         (1100, 840),  # (x, y) position
+                                                         lambda: self.set_font("Flaemisch")), 
+                                                         "Flaemisch")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
+                                                         (740, 910),  # (x, y) position
+                                                         lambda: self.set_font("Lora")), 
+                                                         "Lora")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
+                                                         (920, 910),  # (x, y) position
+                                                         lambda: self.set_font("Linux")), 
+                                                         "Linux")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
+                                                         (1100, 910),  # (x, y) position
+                                                         lambda: self.set_font("Great")), 
+                                                         "Great")     
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
