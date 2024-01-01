@@ -30,8 +30,22 @@ class PhotoBooth:
         self.y_space = 25
         self.y_offset= 25
         self.thumb = False  # Is there a thumbnail
-        self.thumb_size = (1740, 135) # px of thumbnail image
-        self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+        self.thumb_4x1_path= "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"
+        self.thumb_4x1_size= (600, 135) 
+        self.thumb_2x2_path= "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"
+        self.thumb_2x2_size= (1740, 135) 
+
+        self.thumb_size = self.thumb_4x1_size
+        self.thumb_path = self.thumb_4x1_path
+        
+        self.thumb_fonts = {'Oswald':'Oswald/Oswald-VariableFont_wght.ttf',
+                            'Bentham':'Bentham/Bentham-Regular.ttf',
+                            'Flaemisch':'flaemische-kanzleischrift/Flaemische Kanzleischrift.ttf',
+                            'Lora':'Lora/Lora-VariableFont_wght.ttf',
+                            'Linux':'linux_biolinum/LinBiolinum_R.ttf',
+                            'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
+        self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
+        self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #File Management
@@ -44,7 +58,10 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-    
+    def get_thumb_status(self):
+        return self.thumb
+    def get_thumb_size(self):
+        return self.thumb_size
     def style_set(self,style):
         if style == 1: #4Bilder + Thumbnail - 4x6*2 Paper Slipe
             # Image Capturing
@@ -86,7 +103,7 @@ class PhotoBooth:
             self.thumb = False  # Is there a thumbnail
         if style == 3: # 4 Bilder + Thumbnail - 2x6*2 Paper Slipe
             # Image Capturing
-            self.resolution = (2340,1523) # px(width,height)  capturing
+            self.resolution = (2340,1523) #self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png") px(width,height)  capturing
             self.pic_size = (530,350)   # px(width,height) on montage
             # Printing 
             self.printer ="D80_2x6x2" #Name of the printer
@@ -206,8 +223,8 @@ class PhotoBooth:
             for colum in range(0,self.grid_colums,1):
                 im = images[im_number]
                 im = im.resize((self.pic_size[0], self.pic_size[1]))
-                #flipped = im.transpose(method=Image.ROTATE_180)
-                #new_im.paste(flipped, (0, int(y_off)))
+                #flipped = im.tranself.thumb_fontsizespose(method=Image.ROTATE_180)
+                #new_im.paste(flipped, (0, int(y_off)))self._style1_window.add_image(pgimage.Image("Images/style/Zeile1.png",
                 new_im.paste(im, (int(x_off), int(y_off)))
                 x_off += self.x_space + im.size[0]
                 im_number +=1
@@ -244,21 +261,15 @@ class PhotoBooth:
 
     def print_montage(self, dest_file):
         img = Image.open(dest_file)
-        img_print = Image.new("RGB", self.paper_format, color=(255,255,255))
-        y_off=0
-        for row in range(0,self.print_rows,1):
-            colum=0
-            x_off=0
-            for colum in range(0,self.print_colums,1):
-                img_print.paste(img,(int(x_off),int(y_off)))
-                x_off += img.size[0]
-            y_off += img.size[1]
+        img_print = Ielf._style1_window = pgwindow.Window(self.size).img.size[1]
         img_print.save("temps/print_tmp.png")
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
         os.system(line)  # -o media=Custom.7.4x21.0cm
-    def create_thumb(self,text,size,fontsize=50,font="Oswald/Oswald-VariableFont_wght.ttf",anchor="mm",align="center"):
-        self.thumb_img= Image.new(mode="RGBA",size=size,color="gray")
+    def create_thumb(self,text,size,anchor="mm",align="center"):
+        font =  self.thumb_font
+        fontsize = self.thumb_fontsize
+        self.thumb_img= Image.new(mode="RGBA",size=size,color="white")
         font = ImageFont.truetype(font,fontsize)   
         draw = ImageDraw.Draw(self.thumb_img)
         draw.multiline_text((size[0]/2,size[1]/2),text,anchor=anchor,align=align,font=font, fill="black")
