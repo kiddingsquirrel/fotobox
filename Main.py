@@ -22,7 +22,7 @@ class App(cevent.CEvent):
         self._capture_window = pgwindow.Window(self.size)
         self._print_window = pgwindow.Window(self.size)
         self._settings_window = pgwindow.Window(self.size)
-        self._setting_thumbnail = pgwindow.Window(self.size)
+        self._style_window = pgwindow.Window(self.size)
         self._current_window = self._start_window
         self.booth = None
         self.last_montage_path = "temps/collage.jpg"
@@ -38,7 +38,7 @@ class App(cevent.CEvent):
         self._running = True
         pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
         #
-        # Adding button to Start Screen
+        # Start Screen - Adding buttons
         #
         self._start_window.add_button(pgbutton.Button("Images/Start_Button.png",
                                                       (self.size[0]/2, self.size[1]/2),
@@ -50,7 +50,7 @@ class App(cevent.CEvent):
                                                       self.open_settings),
                                                       "settings")
         #
-        # Adding button to Print Screen
+        # Print Screen - Adding buttons
         #
         rely = 45
         self._print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
@@ -67,7 +67,7 @@ class App(cevent.CEvent):
                                                       "weiter")
         
         #
-        # Adding buttons to Settings 
+        # Settings - Adding buttons
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
                                                          self.set_start), # anchor
@@ -103,9 +103,31 @@ class App(cevent.CEvent):
         # Add Button to get to window setting_thumbnail
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
-                                                         self.open_setting_thumbnail),
+                                                         self.open_style_window),
                                                          "Weiter thumbnail")
-                
+        # Style Screen - Adding Buttond and InputTextboxes
+        self._style_window.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._style_window.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
+        self._style_window.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
+        self._style_window.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")           
+        # Adding Button and InputTextbox to setting_thumbnail window
+        self._style_window.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._style_window.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
+        self._style_window.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
+        self._style_window.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
+        
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -254,33 +276,22 @@ class App(cevent.CEvent):
     def open_settings(self):
         self._current_window = self._settings_window
         self.on_render()
-    def open_setting_thumbnail(self):
-        # Adding Button and InputTextbox to setting_thumbnail window
-        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
-                                                         self.open_settings), # anchor
-                                                         "back")
-        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (660, 30),  # (x, y) position
-                                                         self.on_cleanup),
-                                                         "exit")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
-        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
-        self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
-        self._current_window =self._setting_thumbnail
+    def open_style_window(self):
+        self._style_window.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")         
+        self._current_window =self._style_window
         self.on_render()
     def create_thumb_from_input(self):
         print("Creat Thumb")
-        if self._setting_thumbnail.inputboxes['Zeile 2'].get_text()=="":
-            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
+        if self._style_window.inputboxes['Zeile 2'].get_text()=="":
+            text= str(self._style_window.inputboxes['Zeile 1'].get_text())
             # print(text)
         else:
-            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._setting_thumbnail.inputboxes['Zeile 2'].get_text())
+            text= str(self._style_window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._style_window.inputboxes['Zeile 2'].get_text())
             # print(text)
         self.booth.create_thumb(text,self.booth.thumb_size
         
         )
-        self._setting_thumbnail.images["thumbnail"].update(self._setting_thumbnail.images["thumbnail"].path)
+        self._style_window.images["thumbnail"].update(self._style_window.images["thumbnail"].path)
         self.on_render()
 if __name__ == "__main__":
     theApp = App()

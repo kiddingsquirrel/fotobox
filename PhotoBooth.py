@@ -32,6 +32,12 @@ class PhotoBooth:
         self.thumb = False  # Is there a thumbnail
         self.thumb_size = (1740, 135) # px of thumbnail image
         self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+        self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
+        self.thumb_fontsize = 50 
+
+
+
+        
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #File Management
@@ -206,7 +212,7 @@ class PhotoBooth:
             for colum in range(0,self.grid_colums,1):
                 im = images[im_number]
                 im = im.resize((self.pic_size[0], self.pic_size[1]))
-                #flipped = im.transpose(method=Image.ROTATE_180)
+                #flipped = im.tranself.thumb_fontsizespose(method=Image.ROTATE_180)
                 #new_im.paste(flipped, (0, int(y_off)))
                 new_im.paste(im, (int(x_off), int(y_off)))
                 x_off += self.x_space + im.size[0]
@@ -257,7 +263,9 @@ class PhotoBooth:
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
         os.system(line)  # -o media=Custom.7.4x21.0cm
-    def create_thumb(self,text,size,fontsize=50,font="Oswald/Oswald-VariableFont_wght.ttf",anchor="mm",align="center"):
+    def create_thumb(self,text,size,anchor="mm",align="center"):
+        font =  self.thumb_font
+        fontsize = self.thumb_fontsize
         self.thumb_img= Image.new(mode="RGBA",size=size,color="gray")
         font = ImageFont.truetype(font,fontsize)   
         draw = ImageDraw.Draw(self.thumb_img)
