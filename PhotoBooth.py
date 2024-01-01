@@ -1,6 +1,6 @@
 import sys
 import picamera as pcam
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps,ImageFont, ImageColor, ImageDraw
 import time
 import pygame
 import RPi.GPIO as GPIO
@@ -21,7 +21,7 @@ class PhotoBooth:
         self.paper_format = (1800, 2400) # px of paper which will be cut
         self.print_rows= 2   # number of rows of montage on print
         self.print_colums= 1 # number of colums of montage on print
-        # Monatge
+        # Montage
         self.total_pics = 4 # number of pictures taken
         self.grid_rows = 2  # number of rows on montage
         self.grid_colums= 2 # number of columns on montage
@@ -31,10 +31,12 @@ class PhotoBooth:
         self.y_offset= 25
         self.thumb = False  # Is there a thumbnail
         self.thumb_size = (1740, 135) # px of thumbnail image
-        self.thumb_path = "/home/pi/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+        self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+        self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
+        self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #File Management
-        self.save_path = "/media/pi/INTENSO/" #/home/pi/Desktop/Pics/
-        self.back_up_path = "/home/pi/Back_up_Booth_Pics"  
+        self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
+        self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  
         try:
             os.mkdir(self.save_path)
         except OSError:
@@ -64,7 +66,7 @@ class PhotoBooth:
             self.y_offset= 25
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = (1740, 135) # px of thumbnail image
-            self.thumb_path = "/home/pi/Desktop/Thumbnails/2x2_Montage/thumb.png"# path to the thumbnail
+            self.thumb_path = "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"# path to the thumbnail
         if style == 2: #4Bilder
             # Image Capturing
             self.resolution = (2340,1523) # px(width,height)  capturing
@@ -102,7 +104,7 @@ class PhotoBooth:
             self.y_offset= 25
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = (600, 135) # px of thumbnail image
-            self.thumb_path = "/home/pi/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+            self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
 
     def show_image(self, image_path):
         pygame.init()
@@ -211,9 +213,9 @@ class PhotoBooth:
                 im_number +=1
             y_off += self.y_space+im.size[1]
         if self.thumb == True:
-            thumbnail = Image.open(self.thumb_path)
-            thumbnail.resize((self.thumb_size[0], self.thumb_size[1]))
-            new_im.paste(thumbnail,(0, y_off))
+            self.thumb_img = Image.open(self.thumb_path)
+            self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1]))
+            new_im.paste(self.thumb_img,(0, y_off))
         ## Save Thumbnail
         new_im.save(os.path.expanduser(file_path))
         new_im.save("temps/collage.jpg")
@@ -255,5 +257,11 @@ class PhotoBooth:
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
         os.system(line)  # -o media=Custom.7.4x21.0cm
-        
+    def create_thumb(self,text,size,fontsize=50,font="Oswald/Oswald-VariableFont_wght.ttf",anchor="mm",align="center"):
+        self.thumb_img= Image.new(mode="RGBA",size=size,color="gray")
+        font = ImageFont.truetype(font,fontsize)   
+        draw = ImageDraw.Draw(self.thumb_img)
+        draw.multiline_text((size[0]/2,size[1]/2),text,anchor=anchor,align=align,font=font, fill="black")
+        self.thumb_img.save(self.thumb_path)
+        print("saved new thumb to", self.thumb_path)  
 

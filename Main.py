@@ -5,9 +5,12 @@ import cevent
 import pgwindow
 import pgbutton
 import pgimage
+pygame.init() # Necessary to use font libary in class pginputbox
+import pginputbox
 import PhotoBooth
 import time
 import os
+
 
 working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
@@ -19,17 +22,19 @@ class App(cevent.CEvent):
         self._capture_window = pgwindow.Window(self.size)
         self._print_window = pgwindow.Window(self.size)
         self._settings_window = pgwindow.Window(self.size)
+        self._setting_thumbnail = pgwindow.Window(self.size)
         self._current_window = self._start_window
         self.booth = None
         self.last_montage_path = "temps/collage.jpg"
         self.booth = PhotoBooth.PhotoBooth()
         
-        self.settings = {"printing":True, "usb":True, "FULLSCREEN":True}  # all settings should reside in this dict
+        self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
     def on_init(self):
         os.chdir(working_dictonary)
         pygame.init()
-        self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
+        #self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
+        self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
         self._running = True
         pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
         #
@@ -44,7 +49,7 @@ class App(cevent.CEvent):
                                                       (0, 0),
                                                       self.open_settings),
                                                       "settings")
-        #s
+        #
         # Adding button to Print Screen
         #
         rely = 45
@@ -95,11 +100,16 @@ class App(cevent.CEvent):
                                                          (900, 580),  # (x, y) position
                                                          self.style_3), 
                                                          "style_3")
-        
-
-    # def on_event(self, event):
+        # Add Button to get to window setting_thumbnail
+        self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+                                                         (660, 320),  # (x, y) position
+                                                         self.open_setting_thumbnail),
+                                                         "Weiter thumbnail")
+                
+    #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
+
    
     def printone(self):
         self.set_start()
@@ -172,7 +182,6 @@ class App(cevent.CEvent):
                 self.booth.save_path = "/media/pi/{}/Pics/".format(usb_name)
                 None
         self._current_window = self._start_window
-    
     def cam_preview(self):
         self.booth.cam_preview()
         self._current_window = self._settings_window
@@ -189,18 +198,21 @@ class App(cevent.CEvent):
             self._settings_window.buttons["printing"] = pgbutton.Button("Images/settings/PrintingOff.png",
                                                          oldb.location,  # (x, y) position
                                                          self.change_usb)
-        self._current_window = self._start_window
-
-    
+        self._current_window = self._start_window  
     def on_loop(self):
         pass
-
     def on_render(self):
         self._display_surf.fill((0, 0, 0))  # clear all img
         for image in self._current_window.images.values():
             self._display_surf.blit(image.img, image.location)        
         for button in self._current_window.buttons.values():
             self._display_surf.blit(button.img, button.location)
+        for box in self._current_window.inputboxes.values():
+            # Blit the text
+            text_center=box.txt_surface.get_rect(center=(box.size[0]/2,box.size[1]/2))
+            self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
+            # Blit the rect
+            pygame.draw.rect(self._display_surf, box.color, box.rect,2)
 
         pygame.display.flip()
     def on_exit(self):
@@ -242,9 +254,34 @@ class App(cevent.CEvent):
     def open_settings(self):
         self._current_window = self._settings_window
         self.on_render()
-
-
-
+    def open_setting_thumbnail(self):
+        # Adding Button and InputTextbox to setting_thumbnail window
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/Back.png",
+                                                         (300, 30),  # (x, y) position
+                                                         self.open_settings), # anchor
+                                                         "back")
+        self._setting_thumbnail.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (660, 30),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,300),(300,40),"Start",self.create_thumb_from_input),"Zeile 1")
+        self._setting_thumbnail.add_inputbox(pginputbox.InputBox((300,350),(300,40),"",self.create_thumb_from_input),"Zeile 2")
+        self._setting_thumbnail.add_image(pgimage.Image(self.booth.thumb_path,(0,400),self.booth.thumb_size),"thumbnail")
+        self._current_window =self._setting_thumbnail
+        self.on_render()
+    def create_thumb_from_input(self):
+        print("Creat Thumb")
+        if self._setting_thumbnail.inputboxes['Zeile 2'].get_text()=="":
+            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text())
+            # print(text)
+        else:
+            text= str(self._setting_thumbnail.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(self._setting_thumbnail.inputboxes['Zeile 2'].get_text())
+            # print(text)
+        self.booth.create_thumb(text,self.booth.thumb_size
+        
+        )
+        self._setting_thumbnail.images["thumbnail"].update(self._setting_thumbnail.images["thumbnail"].path)
+        self.on_render()
 if __name__ == "__main__":
     theApp = App()
     theApp.execute()

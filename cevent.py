@@ -13,9 +13,9 @@ class CEvent:
         pass
 
     def on_key_down(self, event):
-        print(event.key)
         if event.key == 27:
             self.on_exit()
+        self._current_window.input_inputbox(event)
 
     def on_key_up(self, event):
         pass
@@ -37,6 +37,7 @@ class CEvent:
 
     def on_lbutton_down(self, event):
         self._current_window.press_button(pygame.mouse.get_pos())
+        self._current_window.press_inputbox(pygame.mouse.get_pos())
 
     def on_rbutton_up(self, event):
         pass
