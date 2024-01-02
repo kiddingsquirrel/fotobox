@@ -1,0 +1,7 @@
+# Sxript to start the fotobox automatically on autostart after starting the desktop GUI
+# Script has to be placed in the folder /home/user/.config/lxsession/LXDE-pi
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+@lxterminal -e lxterminal -e python3 /home/fotobox/github/fotobox/Main.py
+
