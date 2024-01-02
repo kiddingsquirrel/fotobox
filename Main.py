@@ -11,6 +11,7 @@ import pgtext
 import PhotoBooth
 import time
 import os
+import subprocess
 
 
 working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
@@ -41,7 +42,7 @@ class App(cevent.CEvent):
         #
         # Start Screen - Adding buttons
         #
-        self._start_window.add_button(pgbutton.Button("Images/Start_Button.png",
+        self._start_window.add_button(pgbutton.Button("Images/Take_Pictures.png",
                                                       (self.size[0]/2, self.size[1]/2),
                                                       self.set_capture,
                                                       y_align='center', x_align='center'), 
@@ -74,10 +75,10 @@ class App(cevent.CEvent):
                                                          (300, 30),  # (x, y) position
                                                          self.set_start), # anchor
                                                          "back")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/close.png",
+        self._settings_window.add_button(pgbutton.Button("Images/settings/ShutDown.png",
                                                          (660, 30),  # (x, y) position
-                                                         self.on_cleanup),
-                                                         "exit")
+                                                         self.shut_down),
+                                                         "shutdown")
         ## Manage USB
         self._settings_window.add_button(pgbutton.Button("Images/settings/USB.png",
                                                          (300,180),  # (x, y) position
@@ -92,7 +93,7 @@ class App(cevent.CEvent):
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
                                                          "printer restart")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
                                                          (660, 320),  # (x, y) position
                                                          self.printer_reset_counter), 
                                                          "printer reset counter")
@@ -100,7 +101,7 @@ class App(cevent.CEvent):
 
 
         ## Has to be adjusted
-        self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
                                                          (300, 460),  # (x, y) position
                                                          self.open_style_1_window),
                                                          "Weiter thumbnail")
@@ -289,6 +290,15 @@ class App(cevent.CEvent):
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
+    def shut_down(self):
+        pygame.quit()
+        self._running=False
+        try:
+            subprocess.run(["sudo","shutdown","-h","now",],check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e}")
+
+
 
     def get_free_system_space(self):
         try:
