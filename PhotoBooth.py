@@ -60,8 +60,7 @@ class PhotoBooth:
             None
         # -----------------------------------------------------------
         pygame.init()
-        self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-        self.save_print_count(self.print_count+1)
+        self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)  
     def load_print_count(self):
         try:
             with open(self.print_log_path,"r") as file:

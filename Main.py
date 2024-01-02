@@ -7,6 +7,7 @@ import pgbutton
 import pgimage
 pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox
+import pgtext
 import PhotoBooth
 import time
 import os
@@ -88,6 +89,7 @@ class App(cevent.CEvent):
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
                                                          "restart")
+        self._settings_window.add_text(pgtext.Text("Text",(0,0)),"Test")
         ## Has to be adjusted
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
@@ -371,6 +373,8 @@ class App(cevent.CEvent):
             self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
             # Blit the rect
             pygame.draw.rect(self._display_surf, box.color, box.rect,2)
+        for text in self._current_window.texts.values():
+            self._display_surf.blit(text.txt_surface,text.location)
 
         pygame.display.flip()
     def on_exit(self):

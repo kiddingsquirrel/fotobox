@@ -3,6 +3,7 @@ class Window:
         self.buttons = {}
         self.images = {}
         self.inputboxes = {}
+        self.texts = {}
         self.size = self.width, self.height = size
         self.background = None
     def add_inputbox(self,inputbox, name):
@@ -15,6 +16,9 @@ class Window:
     def add_button(self, button, name):
         # button needs to be object of class pgbutton.Button
         self.buttons[name] = button
+
+    def add_text(self,text,name):
+        self.texts[name] = text
 
     def press_button(self, pos):
         for button in self.buttons.values():
