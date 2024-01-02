@@ -12,6 +12,7 @@ import PhotoBooth
 import time
 import os
 import subprocess
+import time
 
 
 working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
@@ -23,6 +24,7 @@ class App(cevent.CEvent):
         self._start_window = pgwindow.Window(self.size)
         self._capture_window = pgwindow.Window(self.size)
         self._print_window = pgwindow.Window(self.size)
+        self._printing_window = pgwindow.Window(self.size)
         self._settings_window = pgwindow.Window(self.size)
         self._style1_window = pgwindow.Window(self.size)
         self._style2_window = pgwindow.Window(self.size)
@@ -59,15 +61,14 @@ class App(cevent.CEvent):
         self._print_window.add_button(pgbutton.Button("Images/Print_b1.png",
                                                       (667,785), self.printone,),
                                                       "print once")
-        #self._print_window.add_button(pgbutton.Button("Images/Print_b2.png",
-        #                                              (1045,592), self.printtwo,
-        #                                              y_align='center', x_align='center'),
-        #                                              "print twice")
         self._print_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                       (140,785),
                                                       self.set_start),
                                                       "weiter")
-        
+        # Printing Screen - Adding Image
+        self._printing_window.add_image(pgimage.Image("Images/Printing.png",
+                                                      (400,315),
+                                                      (480,330)),"Printing")
         #
         # Settings - Adding buttons
         ## Mange Screen 
@@ -328,12 +329,12 @@ class App(cevent.CEvent):
             return None 
 
     def printone(self):
-        self.set_start()
         self.booth.print_montage("temps/collage.jpg")
-    def printtwo(self):
+        self.booth.save_print_count(self.booth.print_count+1)
+        self._current_window = self._printing_window
+        self.on_render()
+        time.sleep(5)
         self.set_start()
-        self.booth.print_file("temps/collage.jpg")
-        self.booth.print_file("temps/collage.jpg")
     def printer_restart(self):
         self.booth.printer_restart()
         self._current_window = self._start_window
@@ -404,13 +405,7 @@ class App(cevent.CEvent):
             self._settings_window.buttons["Save Desktop"] = pgbutton.Button("Images/settings/Save_Desktop_active.png",
                                                           self._settings_window.buttons["Save Desktop"].location,  # (x, y) position
                                                           lambda: self.save_to_usb(False))
-            
-            
-            
-            
-                
-            
-        self._current_window = self._settings_window
+        self.on_render()
     def cam_preview(self):
         self.booth.cam_preview()
         self._current_window = self._settings_window 
@@ -440,7 +435,7 @@ class App(cevent.CEvent):
 
     def execute(self):
         self.on_init() # Initialise screens etc. 
-        # self.save_to_usb(True) # Initialise that USB-Stick is primary storage
+        self.save_to_usb(self.settings["usb"]) # Initialise that USB-Stick is primary storage
         if __name__ == '__main__':
             while self._running:
                 for event in pygame.event.get():
@@ -477,7 +472,7 @@ class App(cevent.CEvent):
         self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",
                                                    (300,740),28),"Anweisung2")
         ## Add text to display free storage of SD
-        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn er kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
+        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
                                                    (300,920),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
