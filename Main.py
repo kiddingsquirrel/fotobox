@@ -50,7 +50,7 @@ class App(cevent.CEvent):
                                                       (0, 0),
                                                       self.open_settings),
                                                       "settings")
-        #
+        #self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(0,60),28),"Anweisung1")
         # Print Screen - Adding buttons
         #
         rely = 45
@@ -91,13 +91,17 @@ class App(cevent.CEvent):
         self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
-                                                         "restart")
-        ## Add text to display total number of printed files 
-        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle wurden bereits {} Bilder gedruckt".format(self.booth.print_count),(0,0),28),"Gedruckte Bilder")
-        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle können noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),(0,30),28),"Rest Bilder")
+                                                         "printer restart")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
+                                                         (660, 320),  # (x, y) position
+                                                         self.printer_reset_counter), 
+                                                         "printer reset counter")
+        
+
+
         ## Has to be adjusted
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
-                                                         (660, 320),  # (x, y) position
+                                                         (300, 460),  # (x, y) position
                                                          self.open_style_1_window),
                                                          "Weiter thumbnail")
         
@@ -286,8 +290,15 @@ class App(cevent.CEvent):
     #     if event.type == pygame.QUIT:
     #         self._running = False
 
-    def dummy(self):
-        pass
+    def get_free_system_space(self):
+        try:
+            stat_info = os.statvfs("/")
+            free_space = stat_info.f_frsize * stat_info.f_bavail
+            return free_space/ (1024**3)
+        except Exception as e:
+            print(f"Error: {e}")
+            return None 
+
     def printone(self):
         self.set_start()
         self.booth.print_montage("temps/collage.jpg")
@@ -298,6 +309,8 @@ class App(cevent.CEvent):
     def printer_restart(self):
         self.booth.printer_restart()
         self._current_window = self._start_window
+    def printer_reset_counter(self):
+        self.booth.save_print_count(0)
     def open_style_1_window(self):
         self.booth.style_set(1)
         self._current_window = self._style1_window
@@ -339,12 +352,12 @@ class App(cevent.CEvent):
             self._settings_window.buttons["usb"] = pgbutton.Button("Images/settings/USB.png",
                                                          oldb.location,  # (x, y) position
                                                          self.change_usb)
-            usb_name = os.listdir("/media/pi/")[1]
+            usb_name = os.listdir("/media/fotobox/")[0]
             try:
                 os.mkdir("/media/pi/{}/Pics".format(usb_name))
-                self.booth.save_path = "/media/pi/{}/Pics/".format(usb_name)
+                self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
             except OSError:
-                self.booth.save_path = "/media/pi/{}/Pics/".format(usb_name)
+                self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
                 None
         self._current_window = self._start_window
     def cam_preview(self):
@@ -416,6 +429,13 @@ class App(cevent.CEvent):
         self._current_window = self._start_window
     
     def open_settings(self):
+        ## Add text to display status of printer
+        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner wurden bereits {} Bilder gedruckt".format(self.booth.print_count),(300,630),28),"Gedruckte Bilder")
+        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner können noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),(300,660),28),"Rest Bilder")
+        self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(300,690),28),"Anweisung1")
+        self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",(300,720),28),"Anweisung2")
+        ## Add text to display free storage of SD
+        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn er kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),(300,750),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
     def create_thumb_from_input(self):
