@@ -48,6 +48,9 @@ class PhotoBooth:
         self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
+        #Print Management and Log
+        self.print_log_path = "print_log.txt"
+        self.print_count = self.load_print_count() 
         #File Management
         self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
         self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  
@@ -58,6 +61,18 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
+        self.save_print_count(self.print_count+1)
+    def load_print_count(self):
+        try:
+            with open(self.print_log_path,"r") as file:
+                return int(file.read())
+        except FileNotFoundError:
+            # Creat File if it doesn't exist and return 0
+            self.save_print_count(0)
+            return int(0)
+    def save_print_count(self,count):
+        with open(self.print_log_path,"w") as file:
+            file.write(str(count))        
     def get_thumb_status(self):
         return self.thumb
     def get_thumb_size(self):
@@ -82,8 +97,8 @@ class PhotoBooth:
             self.y_space = 25
             self.y_offset= 25
             self.thumb = True  # Is there a thumbnail
-            self.thumb_size = (1740, 135) # px of thumbnail image
-            self.thumb_path = "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"# path to the thumbnail
+            self.thumb_size = self.thumb_2x2_size # px of thumbnail image
+            self.thumb_path = self.thumb_2x2_path# path to the thumbnail
         if style == 2: #4Bilder
             # Image Capturing
             self.resolution = (2340,1523) # px(width,height)  capturing
@@ -120,8 +135,8 @@ class PhotoBooth:
             self.y_space = 25
             self.y_offset= 25
             self.thumb = True  # Is there a thumbnail
-            self.thumb_size = (600, 135) # px of thumbnail image
-            self.thumb_path = "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"# path to the thumbnail
+            self.thumb_size = self.thumb_4x1_size# px of thumbnail image
+            self.thumb_path = self.thumb_4x1_path # path to the thumbnail
 
     def show_image(self, image_path):
         pygame.init()
@@ -274,6 +289,7 @@ class PhotoBooth:
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
         os.system(line)  # -o media=Custom.7.4x21.0cm
+        self.save_print_count(self.print_count+1)
     def create_thumb(self,text,size,anchor="mm",align="center"):
         font =  self.thumb_font
         fontsize = self.thumb_fontsize
