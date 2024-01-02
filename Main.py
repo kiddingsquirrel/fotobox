@@ -108,11 +108,15 @@ class App(cevent.CEvent):
         
         # Style1 Screen - Adding Buttond and InputTextboxes
         self._style1_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
+                                                         (90, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
+        self._style1_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
+                                                         (500, 30),  # (x, y) position
+                                                         self.set_start), # anchor
+                                                         "Set Start")
         self._style1_window.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (660, 30),  # (x, y) position
+                                                         (900, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
         self._style1_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
@@ -183,11 +187,15 @@ class App(cevent.CEvent):
         
         # Style2 Screen - Adding Buttond and InputTextboxes
         self._style2_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
+                                                         (90, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
+        self._style2_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
+                                                         (500, 30),  # (x, y) position
+                                                         self.set_start), # anchor
+                                                         "Set Start")
         self._style2_window.add_button(pgbutton.Button("Images/settings/close.png",
-                                                     (660, 30),  # (x, y) position
+                                                         (900, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
         self._style2_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
@@ -208,11 +216,15 @@ class App(cevent.CEvent):
                                                          "style_3")   
         # Style1 Screen - Adding Buttond and InputTextboxes
         self._style3_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
+                                                         (90, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
+        self._style3_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
+                                                         (500, 30),  # (x, y) position
+                                                         self.set_start), # anchor
+                                                         "Set Start")
         self._style3_window.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (660, 30),  # (x, y) position
+                                                         (900, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
         self._style3_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
