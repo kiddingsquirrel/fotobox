@@ -261,7 +261,15 @@ class PhotoBooth:
 
     def print_montage(self, dest_file):
         img = Image.open(dest_file)
-        img_print = Ielf._style1_window = pgwindow.Window(self.size).img.size[1]
+        img_print = Image.new("RGB", self.paper_format, color=(255,255,255))
+        y_off=0
+        for row in range(0,self.print_rows,1):
+            colum=0
+            x_off=0
+            for colum in range(0,self.print_colums,1):
+                img_print.paste(img,(int(x_off),int(y_off)))
+                x_off += img.size[0]
+            y_off += img.size[1]
         img_print.save("temps/print_tmp.png")
         line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
         print(line)
