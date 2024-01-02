@@ -51,6 +51,7 @@ class PhotoBooth:
         #Print Management and Log
         self.print_log_path = "print_log.txt"
         self.print_count = self.load_print_count() 
+        self.print_max_count = 215
         #File Management
         self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
         self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  

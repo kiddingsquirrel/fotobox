@@ -69,6 +69,7 @@ class App(cevent.CEvent):
         
         #
         # Settings - Adding buttons
+        ## Mange Screen 
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (300, 30),  # (x, y) position
                                                          self.set_start), # anchor
@@ -77,10 +78,12 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
+        ## Manage USB
         self._settings_window.add_button(pgbutton.Button("Images/settings/USB.png",
                                                          (300,180),  # (x, y) position
                                                          self.change_usb), #
                                                          "usb")
+        ## Manage Camera and Printer
         self._settings_window.add_button(pgbutton.Button("Images/settings/preview.png",
                                                          (660, 180),  # (x, y) position
                                                          self.cam_preview), 
@@ -89,7 +92,9 @@ class App(cevent.CEvent):
                                                          (300, 320),  # (x, y) position
                                                          self.printer_restart), 
                                                          "restart")
-        self._settings_window.add_text(pgtext.Text("Text",(0,0)),"Test")
+        ## Add text to display total number of printed files 
+        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle wurden bereits {} Bilder gedruckt".format(self.booth.print_count),(0,0),28),"Gedruckte Bilder")
+        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle können noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),(0,30),28),"Rest Bilder")
         ## Has to be adjusted
         self._settings_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                          (660, 320),  # (x, y) position
