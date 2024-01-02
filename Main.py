@@ -79,32 +79,37 @@ class App(cevent.CEvent):
                                                          (660, 30),  # (x, y) position
                                                          self.shut_down),
                                                          "shutdown")
-        ## Manage USB
-        self._settings_window.add_button(pgbutton.Button("Images/settings/USB.png",
-                                                         (300,180),  # (x, y) position
-                                                         self.change_usb), #
-                                                         "usb")
         ## Manage Camera and Printer
-        self._settings_window.add_button(pgbutton.Button("Images/settings/preview.png",
-                                                         (660, 180),  # (x, y) position
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Camera_Preview.png",
+                                                         (300, 180),  # (x, y) position
                                                          self.cam_preview), 
                                                          "preview")  
+        
+        ## Manage USB
+        self._settings_window.add_text(pgtext.Text("Speicherort der Aufnahmen ist:",
+                                                   (300,310),36),
+                                                   "Speicherort")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
+                                                         (300,360),  # (x, y) position
+                                                         lambda: self.save_to_usb(False)), #
+                                                         "Save Desktop")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_USB_active.png",
+                                                         (660,360),  # (x, y) position
+                                                         lambda: self.save_to_usb(True)), #
+                                                         "Save USB")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
+                                                         (300, 500),  # (x, y) position
+                                                         self.open_style_1_window),
+                                                         "Weiter thumbnail")
         self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
-                                                         (300, 320),  # (x, y) position
+                                                         (300, 780),  # (x, y) position
                                                          self.printer_restart), 
                                                          "printer restart")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
-                                                         (660, 320),  # (x, y) position
+                                                         (660, 780),  # (x, y) position
                                                          self.printer_reset_counter), 
                                                          "printer reset counter")
         
-
-
-        ## Has to be adjusted
-        self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
-                                                         (300, 460),  # (x, y) position
-                                                         self.open_style_1_window),
-                                                         "Weiter thumbnail")
         
         # Style1 Screen - Adding Buttond and InputTextboxes
         self._style1_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -151,6 +156,7 @@ class App(cevent.CEvent):
                                                     (95,35)),
                                                     "Text Zeile 2")
         ## Font Management 
+                            
         self._style1_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
                                                        (650, 840),  # (x, y) position
                                                        self.set_font_up), 
@@ -361,44 +367,53 @@ class App(cevent.CEvent):
     def set_font_down(self):
         self.booth.thumb_fontsize -=4
         self.create_thumb_from_input()
-    def change_usb(self):
-        oldb = self._settings_window.buttons["usb"]
-        if self.settings["usb"]:
-            self.settings["usb"] = False
-            self._settings_window.buttons["usb"] = pgbutton.Button("Images/settings/Desktop.png",
-                                                         oldb.location,  # (x, y) position
-                                                         self.change_usb)
-            self.booth.save_path = "/home/pi/Desktop/Pics/"
+    def save_to_usb(self,status):
+        if status:
+            try:                                            
+                usb_name = os.listdir("/media/fotobox/")[0]
+                try:
+                    os.mkdir("/media/fotobox/{}/Pics".format(usb_name))
+                    self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
+                except OSError:
+                    self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
+                    None
+                self.settings["usb"] = True
+                self._settings_window.buttons["Save USB"] = pgbutton.Button("Images/settings/Save_USB_active.png",
+                                                          self._settings_window.buttons["Save USB"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(True))
+                self._settings_window.buttons["Save Desktop"] = pgbutton.Button("Images/settings/Save_Desktop.png",
+                                                          self._settings_window.buttons["Save Desktop"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(False))
+                
+            except:
+                self.settings["usb"] = False
+                self.booth.save_path = "/home/fotobox/Desktop/Pics/"
+                self._settings_window.buttons["Save USB"] = pgbutton.Button("Images/settings/Save_USB_erro.png",
+                                                          self._settings_window.buttons["Save USB"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(True))
+                self._settings_window.buttons["Save Desktop"] = pgbutton.Button("Images/settings/Save_Desktop_active.png",
+                                                          self._settings_window.buttons["Save Desktop"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(False))
+                print("There is no USB-Stick connected or mounted. Please insert the usb stick again")
         else:
-            self.settings["usb"] = True
-            self._settings_window.buttons["usb"] = pgbutton.Button("Images/settings/USB.png",
-                                                         oldb.location,  # (x, y) position
-                                                         self.change_usb)
-            usb_name = os.listdir("/media/fotobox/")[0]
-            try:
-                os.mkdir("/media/pi/{}/Pics".format(usb_name))
-                self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
-            except OSError:
-                self.booth.save_path = "/media/fotobox/{}/Pics/".format(usb_name)
-                None
-        self._current_window = self._start_window
+            self.settings["usb"] = False
+            self.booth.save_path = "/home/fotobox/Desktop/Pics/"
+            self._settings_window.buttons["Save USB"] = pgbutton.Button("Images/settings/Save_USB.png",
+                                                          self._settings_window.buttons["Save USB"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(True))
+            self._settings_window.buttons["Save Desktop"] = pgbutton.Button("Images/settings/Save_Desktop_active.png",
+                                                          self._settings_window.buttons["Save Desktop"].location,  # (x, y) position
+                                                          lambda: self.save_to_usb(False))
+            
+            
+            
+            
+                
+            
+        self._current_window = self._settings_window
     def cam_preview(self):
         self.booth.cam_preview()
-        self._current_window = self._settings_window
-    def change_printing(self):
-        oldb = self._settings_window.buttons["printing"]
-        
-        if self.settings["printing"]:
-            self.settings["printing"] = False
-            self._settings_window.buttons["printing"] = pgbutton.Button("Images/settings/PrintingOn.png",
-                                                         oldb.location,  # (x, y) position
-                                                         self.change_usb)
-        else:
-            self.settings["printing"] = True
-            self._settings_window.buttons["printing"] = pgbutton.Button("Images/settings/PrintingOff.png",
-                                                         oldb.location,  # (x, y) position
-                                                         self.change_usb)
-        self._current_window = self._start_window  
+        self._current_window = self._settings_window 
     def on_loop(self):
         pass
     def on_render(self):
@@ -424,7 +439,8 @@ class App(cevent.CEvent):
         self.on_exit()
 
     def execute(self):
-        self.on_init()
+        self.on_init() # Initialise screens etc. 
+        # self.save_to_usb(True) # Initialise that USB-Stick is primary storage
         if __name__ == '__main__':
             while self._running:
                 for event in pygame.event.get():
@@ -452,12 +468,17 @@ class App(cevent.CEvent):
     
     def open_settings(self):
         ## Add text to display status of printer
-        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner wurden bereits {} Bilder gedruckt".format(self.booth.print_count),(300,630),28),"Gedruckte Bilder")
-        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner können noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),(300,660),28),"Rest Bilder")
-        self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(300,690),28),"Anweisung1")
-        self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",(300,720),28),"Anweisung2")
+        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner wurden bereits {} Bilder gedruckt".format(self.booth.print_count),
+                                                   (300,650),28),"Gedruckte Bilder")
+        self._settings_window.add_text(pgtext.Text("Es können mit ihnen noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),
+                                                   (300,680),28),"Rest Bilder")
+        self._settings_window.add_text(pgtext.Text("Wechsel Sie bitte beide, wenn nur noch {} Bilder gedruckt werden können".format(40),
+                                                   (300,710),28),"Anweisung1")
+        self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",
+                                                   (300,740),28),"Anweisung2")
         ## Add text to display free storage of SD
-        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn er kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),(300,750),28),"Speicherplatz")
+        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn er kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
+                                                   (300,920),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
     def create_thumb_from_input(self):
