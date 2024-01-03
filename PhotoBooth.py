@@ -49,7 +49,7 @@ class PhotoBooth:
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #Print Management and Log
-        self.print_log_path = "print_log.txt"
+        self.print_log_path = "/home/fotobox/github/fotobox/print_log.txt"
         self.print_count = self.load_print_count() 
         self.print_max_count = 215
         #File Management
@@ -65,14 +65,17 @@ class PhotoBooth:
     def load_print_count(self):
         try:
             with open(self.print_log_path,"r") as file:
-                return int(file.read())
-        except FileNotFoundError:
+                count= int(file.read())
+                print(f"The current print cout is {str(count)}")
+                return count
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
             # Creat File if it doesn't exist and return 0
-            self.save_print_count(0)
+            self.save_print_count(str(0))
             return int(0)
     def save_print_count(self,count):
         with open(self.print_log_path,"w") as file:
-            file.write(str(count))        
+            file.write(int(count))        
     def get_thumb_status(self):
         return self.thumb
     def get_thumb_size(self):
