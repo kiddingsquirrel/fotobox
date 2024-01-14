@@ -91,11 +91,11 @@ class App(cevent.CEvent):
                                                    (300,310),36),
                                                    "Speicherort")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
-                                                         (300,360),  # (x, y) position
+                                                         (300,370),  # (x, y) position
                                                          lambda: self.save_to_usb(False)), #
                                                          "Save Desktop")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Save_USB_active.png",
-                                                         (660,360),  # (x, y) position
+                                                         (660,370),  # (x, y) position
                                                          lambda: self.save_to_usb(True)), #
                                                          "Save USB")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
@@ -472,8 +472,8 @@ class App(cevent.CEvent):
         self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",
                                                    (300,740),28),"Anweisung2")
         ## Add text to display free storage of SD
-        self._settings_window.add_text(pgtext.Text("Der Freie Speicherplatz beträgt {} Gb. Konatkiere Jonathan wenn kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
-                                                   (300,920),28),"Speicherplatz")
+        self._settings_window.add_text(pgtext.Text("Der lokale Speicherplatz beträgt {} Gb. Kontaktiere Jonathan wenn kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
+                                                   (300,340),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
     def create_thumb_from_input(self):
