@@ -166,7 +166,7 @@ class PhotoBooth:
         # camera.vflip = True
         camera.hflip = True
         camera.saturation = 0 #-100  # -100 B/W 0 Color*
-        camera.shutter_speed = 18000
+        camera.shutter_speed = 18000 # original 18000
         camera.iso = 320
         #camera.start_preview(fullscreen=False, window=(0,0,1208,854))
         camera.start_preview()
