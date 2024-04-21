@@ -8,14 +8,14 @@ import pgimage
 pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox
 import pgtext
-import PhotoBooth
+import PhotoBooth_Dev_Wind
 import time
 import os
 import subprocess
 import time
 
 
-working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
+working_dictonary= "C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
         self._running = True
@@ -30,7 +30,7 @@ class App(cevent.CEvent):
         self._style2_window = pgwindow.Window(self.size)
         self._style3_window = pgwindow.Window(self.size)
         self._current_window = self._start_window
-        self.booth = PhotoBooth.PhotoBooth()
+        self.booth = PhotoBooth_Dev_Wind.PhotoBooth()
         self.last_montage_path = "temps/collage.jpg"
         self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
