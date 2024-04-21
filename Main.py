@@ -15,7 +15,7 @@ import subprocess
 import time
 
 
-working_dictonary= "C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
+working_dictonary= r"C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
         self._running = True
@@ -30,17 +30,17 @@ class App(cevent.CEvent):
         self._style2_window = pgwindow.Window(self.size)
         self._style3_window = pgwindow.Window(self.size)
         self._current_window = self._start_window
-        self.booth = PhotoBooth_Dev_Wind.PhotoBooth()
+        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary)
         self.last_montage_path = "temps/collage.jpg"
         self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
     def on_init(self):
         os.chdir(working_dictonary)
         pygame.init()
-        self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
-        # self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
+        # self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
+        self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
         self._running = True
-        pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
+        # pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
         #
         # Start Screen - Adding buttons
         #

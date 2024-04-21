@@ -4,10 +4,11 @@ import time
 import pygame
 import os
 import shutil
-
+from nc_py_api import Nextcloud
 
 class PhotoBooth:
-    def __init__(self):
+    def __init__(self,base_path):
+        self.base_path = base_path
         # Define some Constants: ------------------------------------
         # Style 2 is default
         # Image Capturing
@@ -28,9 +29,9 @@ class PhotoBooth:
         self.y_space = 25
         self.y_offset= 25
         self.thumb = False  # Is there a thumbnail
-        self.thumb_4x1_path= "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"
+        self.thumb_4x1_path= os.path.join(self.base_path,"Thumbnails/4x1_Montage/thumb.png")
         self.thumb_4x1_size= (600, 135) 
-        self.thumb_2x2_path= "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"
+        self.thumb_2x2_path= os.path.join(self.base_path,"Thumbnails/2x2_Montage/thumb.png")
         self.thumb_2x2_size= (1740, 135) 
 
         self.thumb_size = self.thumb_4x1_size
@@ -42,17 +43,17 @@ class PhotoBooth:
                             'Lora':'Lora/Lora-VariableFont_wght.ttf',
                             'Linux':'linux_biolinum/LinBiolinum_R.ttf',
                             'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
-        self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
+        self.thumb_font = os.path.join(self.base_path,"/Fonts/Oswald/Oswald-VariableFont_wght.ttf")
         self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #Print Management and Log
-        self.print_log_path = "/home/fotobox/github/fotobox/print_log.txt"
+        self.print_log_path = os.path.join(self.base_path,"print_log.txt")
         self.print_count = self.load_print_count() 
         self.print_max_count = 215
         #File Management
-        self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
-        self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  
+        self.save_path = os.path.join(self.base_path,"Dummy_Media/")
+        self.back_up_path = os.path.join(self.base_path,"Dummy_Backup/")  
         try:
             os.mkdir(self.save_path)
         except OSError:
