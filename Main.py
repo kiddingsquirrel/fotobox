@@ -1,5 +1,6 @@
 #! booth-env/bin/python3
-
+import platform
+import psutil
 import pygame
 import cevent
 import pgwindow
@@ -321,13 +322,20 @@ class App(cevent.CEvent):
 
     def get_free_system_space(self):
         try:
-            stat_info = os.statvfs("/")
-            free_space = stat_info.f_frsize * stat_info.f_bavail
-            return free_space/ (1024**3)
+            if platform.system() == "Linux":
+                # Use os.statvfs on Linux
+                stat_info = os.statvfs("/")
+                free_space = stat_info.f_frsize * stat_info.f_bavail
+            else:
+                # Use psutil for non-Linux systems
+                usage = psutil.disk_usage('/')
+                free_space = usage.free
+
+        # Convert bytes to gigabytes
+            return free_space / (1024**3)
         except Exception as e:
             print(f"Error: {e}")
-            return None 
-
+            return None
     def printone(self):
         self.booth.print_montage("temps/collage.jpg")
         self.booth.save_print_count(self.booth.print_count+1)
@@ -354,7 +362,7 @@ class App(cevent.CEvent):
         self.on_render()
     def set_font(self,font_key):
         # Adjust the current thumb_font
-        self.booth.thumb_font="/home/fotobox/github/fotobox/Fonts/"+self.booth.thumb_fonts[font_key]
+        self.booth.thumb_font=os.path.join(working_dictonary,"Fonts",self.booth.thumb_fonts[font_key])
         # Highlight/ activate the current font button on current screen 
         self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png")
         # Deactivate all other font buttons on current screen 
