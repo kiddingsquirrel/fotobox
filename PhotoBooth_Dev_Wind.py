@@ -52,7 +52,9 @@ class PhotoBooth:
         self.print_count = self.load_print_count() 
         self.print_max_count = 215
         #File Management
-        self.save_path = os.path.join(self.base_path,"Dummy_Media/")
+        self.path_desktop = os.path.join(self.base_path,"Dummy_Desktop/")
+        self.path_media = os.path.join(self.base_path,"Dummy_Media")
+        self.save_path = self.path_media
         self.back_up_path = os.path.join(self.base_path,"Dummy_Backup/")  
         try:
             os.mkdir(self.save_path)

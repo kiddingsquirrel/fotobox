@@ -6,7 +6,6 @@ import cevent
 import pgwindow
 import pgbutton
 import pgimage
-pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox
 import pgtext
 import PhotoBooth_Dev_Wind
@@ -15,7 +14,7 @@ import os
 import subprocess
 import time
 
-
+pygame.init() # Necessary to use font libary in class pginputbox
 working_dictonary= r"C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
@@ -396,7 +395,7 @@ class App(cevent.CEvent):
                 
             except:
                 self.settings["usb"] = False
-                self.booth.save_path = "/home/fotobox/Desktop/Pics/"
+                self.booth.save_path = self.booth.path_desktop
                 self._settings_window.buttons["Save USB"] = pgbutton.Button("Images/settings/Save_USB_erro.png",
                                                           self._settings_window.buttons["Save USB"].location,  # (x, y) position
                                                           lambda: self.save_to_usb(True))
@@ -406,7 +405,7 @@ class App(cevent.CEvent):
                 print("There is no USB-Stick connected or mounted. Please insert the usb stick again")
         else:
             self.settings["usb"] = False
-            self.booth.save_path = "/home/fotobox/Desktop/Pics/"
+            self.booth.save_path = self.booth.path_desktop
             self._settings_window.buttons["Save USB"] = pgbutton.Button("Images/settings/Save_USB.png",
                                                           self._settings_window.buttons["Save USB"].location,  # (x, y) position
                                                           lambda: self.save_to_usb(True))
