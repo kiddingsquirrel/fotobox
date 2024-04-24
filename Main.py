@@ -35,6 +35,7 @@ class App(cevent.CEvent):
         self._style3_window = pgwindow.Window(self.size)
         self._current_window = self._start_window
         self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary)
+        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,"test","https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
         self.last_montage_path = "temps/collage.jpg"
         self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
 
@@ -62,18 +63,16 @@ class App(cevent.CEvent):
         #
         rely = 45
         self._print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
-        self._print_window.add_button(pgbutton.Button("Images/Print_b1.png",
-                                                      (667,785), self.printone,),
-                                                      "print once")
         self._print_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                       (140,785),
                                                       self.set_start),
                                                       "weiter")
-        # Printing Screen - Adding Image
-        self._printing_window.add_image(pgimage.Image("Images/Printing.png",
+        # Printing Screen - Adding Qr-Code
+        self._printing_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
                                                       (400,315),
-                                                      (480,330)),"Printing")
-        #
+                                                      (480,330)),"QR_Code")
+
+
         # Settings - Adding buttons
         ## Mange Screen 
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -462,7 +461,11 @@ class App(cevent.CEvent):
         self.on_render()
         self.booth.capture()
         self.last_pic_path = self.booth.make_collage()
+        timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
+        self.NextCloudClient.upload_file(self.last_pic_path,os.path.join(self.NextCloudClient.folder,f"{timestamp}.jpg"))
+        self.NextCloudClient.create_qr(self.NextCloudClient.current_link)
         self._print_window.images["Montage"].update(self.last_pic_path)
+        self._print_window.images["QR_Code"].update(self.NextCloudClient.current_qr_path)
         if self.settings["printing"]:
             self._current_window = self._print_window
             print(self.last_pic_path)
