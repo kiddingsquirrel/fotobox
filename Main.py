@@ -1,20 +1,24 @@
 #! booth-env/bin/python3
+# Importing Standard Libaries 
 import platform
 import psutil
-import pygame
-import cevent
-import pgwindow
-import pgbutton
-import pgimage
-import pginputbox
-import pgtext
-import PhotoBooth_Dev_Wind
 import time
 import os
 import subprocess
 import time
-
+import pygame
+# Importing custom libaries 
+import cevent
+import pgwindow
+import pgbutton
+import pgimage
 pygame.init() # Necessary to use font libary in class pginputbox
+import pginputbox # pygame.init() has to be before import pginputbox !!!!
+import pgtext
+import PhotoBooth_Dev_Wind
+
+
+
 working_dictonary= r"C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):

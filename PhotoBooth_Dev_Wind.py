@@ -5,8 +5,47 @@ import pygame
 import os
 import shutil
 from nc_py_api import Nextcloud
+import qrcode
 
+class NextCloudClient:
+    def __init__(self, url, user, password):
+        self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
+        self.current_link = None
+        self.current_qr = None 
+    def print_structure(self):
+        all_files_folders = self.client.files.listdir(depth=-1)
+        for obj in all_files_folders:
+            print(obj.user_path)
+    def upload_file(self,local_path, destination_path):
+        with open(local_path,"rb") as file:
+            try:
+                file_data = file.read() # Ensure that fill is read correctly 
+                response=self.client.files.upload(destination_path, file_data)
+                print(response)
+                self.current_link= self.client.files.sharing.create(destination_path,3).url
+                return self.current_link
+            except:
+                print("There was a problem uploading and creating the link")
+                return None
+    def create_qr(self, link):
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4)
+            qr.add_data(link)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            self.current_qr= img
+            print(f"Created qr-Code for {link}")
+            return img
+        except:
+            print(f"Error creating QR-Code for {link}")
+            return None
+                         
 class PhotoBooth:
+    
     def __init__(self,base_path):
         self.base_path = base_path
         # Define some Constants: ------------------------------------
