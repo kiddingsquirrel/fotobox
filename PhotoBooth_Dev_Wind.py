@@ -9,25 +9,38 @@ import qrcode
 
 class NextCloudClient:
     def __init__(self,base_path,nc_folder, url, user, password):
-        self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
+        # self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
+        # print(self.client.files.sharing.available)
         self.folder = nc_folder
         self.basepath = base_path
         self.current_link = None
-        self.current_qr_path = None 
+        self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
+    
     def print_structure(self):
+        """
         all_files_folders = self.client.files.listdir(depth=-1)
         for obj in all_files_folders:
             print(obj.user_path)
+        """
+        pass
     def upload_file(self,local_path, destination_path):
-        with open(local_path,"rb") as file:
-            try:
+        """
+        try:
+            with open(local_path,"rb") as file:
                 file_data = file.read() # Ensure that fill is read correctly 
                 response=self.client.files.upload(destination_path, file_data)
                 print(response)
-                self.current_link= self.client.files.sharing.create(destination_path,3).url
-            except:
-                print("There was a problem uploading and creating the link")
+                link = self.client.files.sharing.create(destination_path,3).url
+                print(link)
+                return(link)
+        except Exception as e:
+            print(f"There was a problem uploading and creating the link: {e}")
+            return None
+        """
+        print("Uploaded part ")
+        pass
     def create_qr(self, link, timestamp):
+        """
         try:
             qr = qrcode.QRCode(
                 version=1,
@@ -37,12 +50,14 @@ class NextCloudClient:
             qr.add_data(link)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
-            self.current_qr_path = os.path.join(self.basepath,f"{timestamp}_QR.png")
+            self.current_qr_path = os.path.join(self.basepath,"temps","QR.png")
             img.save(self.current_qr_path)
             print(f"Created qr-Code for {link}")
         except:
             print(f"Error creating QR-Code for {link}")
-                                 
+        """
+        print("Created QR")
+        pass                      
 class PhotoBooth:
     
     def __init__(self,base_path):

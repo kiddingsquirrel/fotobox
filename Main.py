@@ -25,30 +25,44 @@ class App(cevent.CEvent):
         self._running = True
         self._display_surf = None
         self.size = self.width, self.height = 1280, 1024
+        # Initialize Screens - Basic Functionality
         self._start_window = pgwindow.Window(self.size)
         self._capture_window = pgwindow.Window(self.size)
-        self._print_window = pgwindow.Window(self.size)
+        self._after_capture_QR_window = pgwindow.Window(self.size)
+        self._after_capture_print_window = pgwindow.Window(self.size)
+        self._after_capture_print_QR_window = pgwindow.Window(self.size)
         self._printing_window = pgwindow.Window(self.size)
+        self._QR_window = pgwindow.Window(self.size)
+        self._printing_QR_window = pgwindow.Window(self.size)
+        # Initialize Screens - Handling Erros - but Insure User - Images are Saved
+        self._QR_failed_window = pgwindow.Window(self.size)
+        self._printing_failed_window = pgwindow.Window(self.size)
+        # Optimizing User Experience 
         self._settings_window = pgwindow.Window(self.size)
         self._style1_window = pgwindow.Window(self.size)
         self._style2_window = pgwindow.Window(self.size)
         self._style3_window = pgwindow.Window(self.size)
+        # Initializing Start Situation 
         self._current_window = self._start_window
         self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary)
-        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,"test","https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
+        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,"Test","https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
         self.last_montage_path = "temps/collage.jpg"
-        self.settings = {"printing":True, "usb":True, "FULLSCREEN":False}  # all settings should reside in this dict
+        self.last_QR_path ="temps/QR.jpg"
+        self.settings = {"printing":True, "Upload":True, "usb":True, "FULLSCREEN": False}  # all settings should reside in this dict
 
     def on_init(self):
         os.chdir(working_dictonary)
         pygame.init()
-        # self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN | 
-        self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
+        if self.settings["FULLSCREEN"]==True:
+            self._display_surf = pygame.display.set_mode(self.size, pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN |
+        elif self.settings["FULLSCREEN"]==False:
+            self._display_surf = pygame.display.set_mode(self.size, pygame.RESIZABLE | pygame.HWSURFACE | pygame.DOUBLEBUF)  # pygame.RESIZABLE FULLSCREEN
+        else:
+            print("Error Setting Screen-Settings")
         self._running = True
         # pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))  # setting a invisible cursor
         #
         # Start Screen - Adding buttons
-        #
         self._start_window.add_button(pgbutton.Button("Images/Take_Pictures.png",
                                                       (self.size[0]/2, self.size[1]/2),
                                                       self.set_capture,
@@ -59,20 +73,62 @@ class App(cevent.CEvent):
                                                       self.open_settings),
                                                       "settings")
         #self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(0,60),28),"Anweisung1")
-        # Print Screen - Adding buttons
-        #
-        rely = 45
-        self._print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
-        self._print_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+        #### HIER WEITER ARBEITEN 
+        # After Capture Screens - Adding buttons
+        ## Printing
+        self._after_capture_print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
+        self._after_capture_print_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
                                                       (140,785),
                                                       self.set_start),
                                                       "weiter")
-        # Printing Screen - Adding Qr-Code
-        self._printing_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
-                                                      (400,315),
-                                                      (480,330)),"QR_Code")
+        self._after_capture_print_window.add_button(pgbutton.Button("Images/Print_b1.png",
+                                                      (667,785), self.printone,),
+                                                      "print once")
+              
+        # After Capture QR Screen 
+        self._after_capture_QR_window.add_image(pgimage.Image(self.last_montage_path,
+                                                              (140,30),
+                                                              (1000,667)),
+                                                              "Montage")
+        self._after_capture_QR_window.add_image(pgimage.Image("Images/Qr_explain.png",
+                                                (140,755),
+                                                (645,100)),
+                                                "Text")
+        self._after_capture_QR_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
+                                                                    (890,745),
+                                                                    (250,250)),
+                                                                    "QR")
+        self._after_capture_QR_window.add_button(pgbutton.Button("Images/Qr_weiter.png",
+                                                      (140,875),
+                                                      self.set_start),
+                                                      "weiter")
+        #  After Capture Printing QR - Screen
+        self._after_capture_print_QR_window.add_image(pgimage.Image(self.last_montage_path,
+                                                                    (140,55),
+                                                                    (1000,667)),
+                                                                    "Montage")
+        self._after_capture_print_QR_window.add_image(pgimage.Image("Images/Print_Qr_explain.png",
+                                                                    (140,750),
+                                                                    (650,88)),
+                                                                    "Text")
+        self._after_capture_print_QR_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
+                                                                    (890,745),
+                                                                    (250,250)),
+                                                                    "QR")
+        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/Print_Qr_bWeiter.png",
+                                                      (140,875),
+                                                      self.set_start),
+                                                      "weiter")
+        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/Print_Qr_b1.png",
+                                                      (516,875), self.printone,),
+                                                      "print once")
+        
 
-
+        # Printing Screen 
+        self._printing_window.add_image(pgimage.Image("Images/Printing.png",
+                                                      (400,318),
+                                                      (479,326)),
+                                                      "Printing")
         # Settings - Adding buttons
         ## Mange Screen 
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -362,6 +418,9 @@ class App(cevent.CEvent):
         self.booth.style_set(3)
         self._current_window = self._style3_window
         self.on_render()
+    def open_QR_window(self):
+        # tbd.
+        pass
     def set_font(self,font_key):
         # Adjust the current thumb_font
         self.booth.thumb_font=os.path.join(working_dictonary,"Fonts",self.booth.thumb_fonts[font_key])
@@ -454,7 +513,7 @@ class App(cevent.CEvent):
                     self.on_render()
             self.on_cleanup()
     def set_print(self):
-        self._current_window = self._print_window
+        self._current_window = self._after_capture_print_window
 
     def set_capture(self):
         self._current_window = self._capture_window
@@ -462,13 +521,21 @@ class App(cevent.CEvent):
         self.booth.capture()
         self.last_pic_path = self.booth.make_collage()
         timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
-        self.NextCloudClient.upload_file(self.last_pic_path,os.path.join(self.NextCloudClient.folder,f"{timestamp}.jpg"))
-        self.NextCloudClient.create_qr(self.NextCloudClient.current_link)
-        self._print_window.images["Montage"].update(self.last_pic_path)
-        self._print_window.images["QR_Code"].update(self.NextCloudClient.current_qr_path)
-        if self.settings["printing"]:
-            self._current_window = self._print_window
+        link = self.NextCloudClient.upload_file(self.last_pic_path,f"Test/{timestamp}.jpg")
+        self.NextCloudClient.create_qr(link,timestamp)
+             
+        if self.settings["printing"]==True and self.settings["Upload"]==False:
+            self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
+            self._current_window = self._after_capture_print_window
             print(self.last_pic_path)
+        elif self.settings["printing"]==False and self.settings["Upload"]==True:
+            self._after_capture_QR_window.images["Montage"].update(self.last_pic_path)
+            self._after_capture_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
+            self._current_window = self._after_capture_QR_window
+        elif self.settings["printing"]==True and self.settings["Upload"]==True:
+            self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
+            self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
+            self._current_window = self._after_capture_print_QR_window
         else:
             self._current_window = self._start_window
 
