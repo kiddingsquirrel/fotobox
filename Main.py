@@ -79,11 +79,11 @@ class App(cevent.CEvent):
         # After Capture Screens - Adding buttons
         ## Printing
         self._after_capture_print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
-        self._after_capture_print_window.add_button(pgbutton.Button("Images/Print_bWeiter.png",
+        self._after_capture_print_window.add_button(pgbutton.Button("Images/After_Capture/Print_bWeiter.png",
                                                       (140,785),
                                                       self.set_start),
-                                                      "weiter")
-        self._after_capture_print_window.add_button(pgbutton.Button("Images/Print_b1.png",
+                                                      "zurück")
+        self._after_capture_print_window.add_button(pgbutton.Button("Images/After_Capture/Print_b1.png",
                                                       (667,785), self.printone,),
                                                       "print once")
               
@@ -92,7 +92,7 @@ class App(cevent.CEvent):
                                                               (140,30),
                                                               (1000,667)),
                                                               "Montage")
-        self._after_capture_QR_window.add_image(pgimage.Image("Images/Qr_explain.png",
+        self._after_capture_QR_window.add_image(pgimage.Image("Images/After_Capture/Qr_explain.png",
                                                 (140,755),
                                                 (645,100)),
                                                 "Text")
@@ -100,7 +100,7 @@ class App(cevent.CEvent):
                                                                     (890,745),
                                                                     (250,250)),
                                                                     "QR")
-        self._after_capture_QR_window.add_button(pgbutton.Button("Images/Qr_weiter.png",
+        self._after_capture_QR_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
                                                       (140,875),
                                                       self.set_start),
                                                       "weiter")
@@ -109,7 +109,7 @@ class App(cevent.CEvent):
                                                                     (140,55),
                                                                     (1000,667)),
                                                                     "Montage")
-        self._after_capture_print_QR_window.add_image(pgimage.Image("Images/Print_Qr_explain.png",
+        self._after_capture_print_QR_window.add_image(pgimage.Image("Images/After_Capture/Print_Qr_explain.png",
                                                                     (140,750),
                                                                     (650,88)),
                                                                     "Text")
@@ -117,11 +117,11 @@ class App(cevent.CEvent):
                                                                     (890,745),
                                                                     (250,250)),
                                                                     "QR")
-        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/Print_Qr_bWeiter.png",
+        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/After_Capture/Print_Qr_bWeiter.png",
                                                       (140,875),
                                                       self.set_start),
                                                       "weiter")
-        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/Print_Qr_b1.png",
+        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/After_Capture/Print_Qr_b1.png",
                                                       (516,875), self.printone,),
                                                       "print once")
         
@@ -134,43 +134,74 @@ class App(cevent.CEvent):
         # Settings - Adding buttons
         ## Mange Screen 
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (300, 30),  # (x, y) position
+                                                         (85, 20),  # (x, y) position
                                                          self.set_start), # anchor
                                                          "back")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/close.png",
+                                                         (490, 20),  # (x, y) position
+                                                         self.on_cleanup),
+                                                         "exit")
         self._settings_window.add_button(pgbutton.Button("Images/settings/ShutDown.png",
-                                                         (660, 30),  # (x, y) position
+                                                         (890, 20),  # (x, y) position
                                                          self.shut_down),
                                                          "shutdown")
-        ## Manage Camera and Printer
+        ## Manage Camera and Montage
         self._settings_window.add_button(pgbutton.Button("Images/settings/Camera_Preview.png",
-                                                         (300, 180),  # (x, y) position
+                                                         (15, 165),  # (x, y) position
                                                          self.cam_preview), 
-                                                         "preview")  
-        
-        ## Manage USB
-        self._settings_window.add_text(pgtext.Text("Speicherort der Aufnahmen ist:",
-                                                   (300,310),36),
-                                                   "Speicherort")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
-                                                         (300,370),  # (x, y) position
-                                                         lambda: self.save_to_usb(False)), #
-                                                         "Save Desktop")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_USB_active.png",
-                                                         (660,370),  # (x, y) position
-                                                         lambda: self.save_to_usb(True)), #
-                                                         "Save USB")
+                                                         "preview")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
-                                                         (300, 500),  # (x, y) position
+                                                         (650, 165),  # (x, y) position
                                                          self.open_style_1_window),
-                                                         "Weiter thumbnail")
+                                                         "Weiter thumbnail")  
+        
+        ## Manage Use of Montage
+        self._settings_window.add_text(pgtext.Text("Wie soll der Nutzer die Montage bekommen",
+                                                   (21,300),36),
+                                                   "TMontage")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/NA_pT_dF.png",
+                                                         (21,350),  # (x, y) position
+                                                         lambda: self.set_use_montage(True,False)), #
+                                                         "pT_dF")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/NA_pT_dT.png",
+                                                         (330,350),  # (x, y) position
+                                                         lambda: self.set_use_montage(True,True)), #
+                                                         "pT_dT")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/NA_pF_dT.png",
+                                                         (655,350),  # (x, y) position
+                                                         lambda: self.set_use_montage(False,True)), #
+                                                         "pF_dT")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/NA_pF_dF.png",
+                                                         (970,350),  # (x, y) position
+                                                         lambda: self.set_use_montage(False,False)), #
+                                                         "pF_dF")
+        self.set_use_montage(self.settings["printing"], self.settings["Upload"])
+
+        ## Manage Printer
         self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
-                                                         (300, 780),  # (x, y) position
+                                                         (20, 850),  # (x, y) position
                                                          self.printer_restart), 
                                                          "printer restart")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
-                                                         (660, 780),  # (x, y) position
+                                                         (325, 850),  # (x, y) position
                                                          self.printer_reset_counter), 
                                                          "printer reset counter")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Tutorial_Printer.png",
+                                                         (20,770),
+                                                         self.open_tutorial_printer_window),"Tutorial Printer")
+
+        ## Mange USB 
+        
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
+                                                         (660,515),  # (x, y) position
+                                                         lambda: self.save_to_usb(False)), #
+                                                         "Save Desktop")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Save_USB_active.png",
+                                                         (970,515),  # (x, y) position
+                                                         lambda: self.save_to_usb(True)), #
+                                                         "Save USB")
+        
+        
         
         
         # Style1 Screen - Adding Buttond and InputTextboxes
@@ -405,9 +436,16 @@ class App(cevent.CEvent):
         self.set_start()
     def printer_restart(self):
         self.booth.printer_restart()
-        self._current_window = self._start_window
     def printer_reset_counter(self):
         self.booth.save_print_count(0)
+        self.booth.print_count = self.booth.load_print_count()
+        # self.booth.print_count=0
+        # print("print count 1",self.booth.print_count)
+        print("print count 2",self.booth.print_count)
+        print("updatet Count")
+        self.open_settings()
+    def open_tutorial_printer_window(self):
+        pass # tbd.
     def open_style_1_window(self):
         self.booth.style_set(1)
         self._current_window = self._style1_window
@@ -439,6 +477,23 @@ class App(cevent.CEvent):
     def set_font_down(self):
         self.booth.thumb_fontsize -=4
         self.create_thumb_from_input()
+    def set_use_montage(self, b_printing, b_upload):
+        self.settings["printing"]=b_printing
+        self.settings["Upload"]=b_upload
+        self._settings_window.buttons["pT_dF"].update_image("Images/settings/NA_pT_dF.png")
+        self._settings_window.buttons["pT_dT"].update_image("Images/settings/NA_pT_dT.png")
+        self._settings_window.buttons["pF_dT"].update_image("Images/settings/NA_pF_dT.png")
+        self._settings_window.buttons["pF_dF"].update_image("Images/settings/NA_pF_dF.png")
+        if self.settings["printing"]== True and self.settings["Upload"]==False:
+            self._settings_window.buttons["pT_dF"].update_image("Images/settings/A_pT_dF.png")
+        if self.settings["printing"]== True and self.settings["Upload"]==True:
+            self._settings_window.buttons["pT_dT"].update_image("Images/settings/A_pT_dT.png")
+        if self.settings["printing"]== False and self.settings["Upload"]==True:
+            self._settings_window.buttons["pF_dT"].update_image("Images/settings/A_pF_dT.png")
+        if self.settings["printing"]== False and self.settings["Upload"]==False:
+            self._settings_window.buttons["pF_dF"].update_image("Images/settings/A_pF_dF.png")
+
+
     def save_to_usb(self,status):
         if status:
             try:                                            
@@ -546,17 +601,25 @@ class App(cevent.CEvent):
     
     def open_settings(self):
         ## Add text to display status of printer
-        self._settings_window.add_text(pgtext.Text("Mit der aktuellen Papierrolle und Toner wurden bereits {} Bilder gedruckt".format(self.booth.print_count),
-                                                   (300,650),28),"Gedruckte Bilder")
-        self._settings_window.add_text(pgtext.Text("Es können mit ihnen noch {} Bilder gedruckt werden".format(self.booth.print_max_count-self.booth.print_count),
-                                                   (300,680),28),"Rest Bilder")
-        self._settings_window.add_text(pgtext.Text("Wechsel Sie bitte beide, wenn nur noch {} Bilder gedruckt werden können".format(40),
-                                                   (300,710),28),"Anweisung1")
-        self._settings_window.add_text(pgtext.Text("Starte danach bitte den Drucker neu und Resete den Zähler",
-                                                   (300,740),28),"Anweisung2")
+        self._settings_window.add_text(pgtext.Text("Drucker - Status: ",
+                                                   (20,490),28),"Drucker Status")
+        self._settings_window.add_text(pgtext.Text("- Verbindung mit Drucker: {}".format("TBD"),
+                                                   (20,530),28),"Drucker Verbindung")
+        self._settings_window.add_text(pgtext.Text("- aktueller Zähler Montagen: {}".format(self.booth.print_count),
+                                                   (20,570),28),"Drucker Zähler ")
+        self._settings_window.add_text(pgtext.Text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count),
+                                                   (20,610),28),"Drucker Restkapazität")
+        self._settings_window.add_text(pgtext.Text("Drucker - Hinweis: ",
+                                                   (20,650),28),"Drucker Hinweis")
+        self._settings_window.add_text(pgtext.Text("- Toner und Papier bei Restkapazität von {} wechseln".format(40),
+                                                   (20,690),28),"Drucker Anweisung1")
+        self._settings_window.add_text(pgtext.Text("- Danach ist Neustart und Zäherreset notwendig",
+                                                   (20,730),28),"Drucker Anweisung2")
         ## Add text to display free storage of SD
-        self._settings_window.add_text(pgtext.Text("Der lokale Speicherplatz beträgt {} Gb. Kontaktiere Jonathan wenn kleiner als 1 GB ".format(str(round(self.get_free_system_space(),2))),
-                                                   (300,340),28),"Speicherplatz")
+        self._settings_window.add_text(pgtext.Text("Speicherort der Bilder",
+                                                   (660,490),28),"Speichern")
+        self._settings_window.add_text(pgtext.Text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))),
+                                                   (660,640),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
     def create_thumb_from_input(self):

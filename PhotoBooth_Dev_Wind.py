@@ -129,7 +129,7 @@ class PhotoBooth:
             return int(0)
     def save_print_count(self,count):
         with open(self.print_log_path,"w") as file:
-            file.write(int(count))        
+            file.write(str(count))        
     def get_thumb_status(self):
         return self.thumb
     def get_thumb_size(self):
