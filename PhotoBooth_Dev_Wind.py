@@ -6,30 +6,58 @@ import os
 import shutil
 from nc_py_api import Nextcloud
 import qrcode
-
+from pathlib import Path
 class NextCloudClient:
     def __init__(self,base_path,nc_folder, url, user, password):
-        self.folder = nc_folder
         self.basepath = base_path
+        self.nc_folder = nc_folder
         self.url= url
         self.user = user
         self.password = password
         self.connect_client()
         self.current_link = None
         self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
+        self.last_upload_succesfull = False
     def connect_client(self):
         try:
             self.client = Nextcloud(nextcloud_url = self.url,nc_auth_user=self.user, nc_auth_pass=self.password)
-            self.nc_available = True
+            api_response= None
+            try:
+                api_response = self.client.files.sharing.available
+                if api_response:
+                    self.nc_available = True
+                    print("NC connected")
+                else:
+                    self.nc_available = False
+            except Exception as e:
+                print("NC not connected - see detailed information")
+                print(e)
+                self.nc_available= False
         except Exception as e:
             print(e)
             self.nc_available = False
     def print_structure(self):
-        
         all_files_folders = self.client.files.listdir(depth=-1)
         for obj in all_files_folders:
             print(obj.user_path)
     def upload_file(self,local_path, destination_path):
+        print(destination_path)
+        try:
+            with open(local_path,"rb") as file:
+                file_data = file.read() # Ensure that fill is read correctly 
+                response=self.client.files.upload(destination_path, file_data)
+                print(response)
+                link = self.client.files.sharing.create(destination_path,3).url
+                self.last_upload_succesfull=True
+                print(link)
+                return(link)
+        except Exception as e:
+            self.last_upload_succesfull=False
+            print(f"There was a problem uploading and creating the link: {e}")
+            return None
+    def upload_file2(self,local_path, file_name):
+        destination_path = f"{self.nc_folder}/{file_name}"
+        print(destination_path)
         try:
             with open(local_path,"rb") as file:
                 file_data = file.read() # Ensure that fill is read correctly 
@@ -37,13 +65,14 @@ class NextCloudClient:
                 print(response)
                 link = self.client.files.sharing.create(destination_path,3).url
                 print(link)
+                self.last_upload_succesfull=True
                 return(link)
         except Exception as e:
+            self.last_upload_succesfull=False
             print(f"There was a problem uploading and creating the link: {e}")
             return None
         
     def create_qr(self, link, timestamp):
-        
         try:
             qr = qrcode.QRCode(
                 version=1,

@@ -30,11 +30,13 @@ class App(cevent.CEvent):
         self._start_window = pgwindow.Window(self.size)                     # Welcome Screen with button to start the PhotoBox
         self._capture_window = pgwindow.Window(self.size)                   # Black-Screen on which Camera Images is overlaided
         # Screens to handle displaying and usage of the images 
+        self._development_window = pgwindow.Window(self.size)
         self._after_capture_window = pgwindow.Window(self.size)             # Screen with Montage, Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==False             
         self._after_capture_QR_window = pgwindow.Window(self.size)          # Screen with Montage, QR-Code and Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==True
         self._after_capture_print_window = pgwindow.Window(self.size)       # Screen with Montage, Button to print and Button to go back to start -> Displayed at self.settings["printing"]==True and self.settings["QR"]==False
         self._after_capture_print_QR_window = pgwindow.Window(self.size)    # Screen with Montage, QR-Code, Button to print and Button to go back to start -> Displayed at self.settings["printing"]== True and self.settings["QR"]==True
         self._printing_window = pgwindow.Window(self.size)
+        
         self._QR_window = pgwindow.Window(self.size)                        # Do i really need it ? 
         self._printing_QR_window = pgwindow.Window(self.size)               # Do i really need it ? 
         # Initialize Screens - Handling Erros - but Insure User - Images are Saved
@@ -75,6 +77,10 @@ class App(cevent.CEvent):
                                                       (0, 0),
                                                       self.open_settings),
                                                       "settings")
+        # Uploading 
+
+        self._development_window.add_image(pgimage.Image("Images/Image_Development.png",(380,140),(520,600)),"Upload")
+        
         #self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(0,60),28),"Anweisung1")
         #### HIER WEITER ARBEITEN 
         # After Capture Screens - Adding buttons
@@ -139,6 +145,7 @@ class App(cevent.CEvent):
                                                       (400,318),
                                                       (479,326)),
                                                       "Printing")
+        
         # Settings - Adding buttons
         ## Mange Screen 
         self._settings_window.add_button(pgbutton.Button("Images/settings/Back.png",
@@ -584,28 +591,38 @@ class App(cevent.CEvent):
         self._current_window = self._capture_window
         self.on_render()
         self.booth.capture()
+        self._current_window = self._development_window
+        self.on_render()
         self.last_pic_path = self.booth.make_collage()
         timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
-        link = self.NextCloudClient.upload_file(self.last_pic_path,f"Test/{timestamp}.jpg")
-        self.NextCloudClient.create_qr(link,timestamp)
-             
-        if self.settings["printing"]==True and self.settings["Upload"]==False:
-            self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
-            self._current_window = self._after_capture_print_window
-            print(self.last_pic_path)
-        elif self.settings["printing"]==False and self.settings["Upload"]==True:
-            self._after_capture_QR_window.images["Montage"].update(self.last_pic_path)
-            self._after_capture_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
-            self._current_window = self._after_capture_QR_window
-        elif self.settings["printing"]==True and self.settings["Upload"]==True:
-            self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
-            self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
-            self._current_window = self._after_capture_print_QR_window
-        elif self.settings["printing"]==False and self.settings["Upload"]==False:
-            self._current_window = self._after_capture_window
+        if self.settings["Upload"]==True:
+            #link = self.NextCloudClient.upload_file(self.last_pic_path,f"Test/{timestamp}.jpg")
+            link = self.NextCloudClient.upload_file2(self.last_pic_path,f"{timestamp}.jpg")
+            self.NextCloudClient.create_qr(link,timestamp)
+            time.sleep(2)
+            if self.NextCloudClient.last_upload_succesfull:
+                if self.settings["printing"]==True:
+                    self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
+                    self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
+                    self._current_window = self._after_capture_print_QR_window
+                else:
+                    self._after_capture_QR_window.images["Montage"].update(self.last_pic_path)
+                    self._after_capture_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
+                    self._current_window = self._after_capture_QR_window
+            else:
+                if self.settings["printing"]==True:
+                    self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
+                    self._current_window = self._after_capture_print_window
+                else:
+                    self._after_capture_window.images["Montage"].update(self.last_pic_path)
+                    self._current_window = self._after_capture_window
         else:
-            self._current_window = self._start_window
-
+            if self.settings["printing"]==True:
+                self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
+                self._current_window = self._after_capture_print_window
+            else:
+                self._after_capture_window.images["Montage"].update(self.last_pic_path)
+                self._current_window = self._after_capture_window
     def set_start(self):
         self._current_window = self._start_window
     
@@ -633,15 +650,15 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
         ## Add text for status of NextCloud 
-        self._settings_window.add_text(pgtext.Text("Cloud - Status:",
-                                                    (660,690),28),"Cloud Status")
-        self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
-                                                   (660,730),28),"Network")
-        self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_folder(), 
-                                                                                           "Erreibar " if self.NextCloudClient.get_availability() 
-                                                                                           else "Nicht erreichar"
-                                                                                           ),
-                                                   (660,810),28),"NC-Erreichbarkeit")
+        #self._settings_window.add_text(pgtext.Text("Cloud - Status:",
+        #                                            (660,690),28),"Cloud Status")
+        #self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
+        #                                           (660,730),28),"Network")
+        #self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_folder(), 
+        #                                                                                   "Erreibar " if self.NextCloudClient.get_availability() 
+        #                                                                                   else "Nicht erreichar"
+        #                                                                                   ),
+        #                                           (660,810),28),"NC-Erreichbarkeit")
     def create_thumb_from_input(self):
         window=self._current_window
         if window.inputboxes['Zeile 2'].get_text()=="":
