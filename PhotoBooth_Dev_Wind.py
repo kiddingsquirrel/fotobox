@@ -9,13 +9,21 @@ import qrcode
 
 class NextCloudClient:
     def __init__(self,base_path,nc_folder, url, user, password):
-        self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
-        print(self.client.files.sharing.available)
         self.folder = nc_folder
         self.basepath = base_path
+        self.url= url
+        self.user = user
+        self.password = password
+        self.connect_client()
         self.current_link = None
         self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
-    
+    def connect_client(self):
+        try:
+            self.client = Nextcloud(nextcloud_url = self.url,nc_auth_user=self.user, nc_auth_pass=self.password)
+            self.nc_available = True
+        except Exception as e:
+            print(e)
+            self.nc_available = False
     def print_structure(self):
         
         all_files_folders = self.client.files.listdir(depth=-1)
