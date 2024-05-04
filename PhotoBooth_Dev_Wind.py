@@ -36,6 +36,19 @@ class NextCloudClient:
         except Exception as e:
             print(e)
             self.nc_available = False
+    def check_folder_exist(self, folder_name):
+        try:
+            all_files_folders = self.client.files.listdir(depth=1)
+            user_paths = []
+            for obj in all_files_folders:
+                user_paths.append(obj.user_path)
+            if f"{folder_name}/" in user_paths:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
     def print_structure(self):
         all_files_folders = self.client.files.listdir(depth=-1)
         for obj in all_files_folders:
@@ -87,7 +100,6 @@ class NextCloudClient:
             print(f"Created qr-Code for {link}")
         except:
             print(f"Error creating QR-Code for {link}")
-        
         print("Created QR")
                              
 class PhotoBooth:

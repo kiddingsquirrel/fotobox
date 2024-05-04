@@ -598,9 +598,8 @@ class App(cevent.CEvent):
         if self.settings["Upload"]==True:
             #link = self.NextCloudClient.upload_file(self.last_pic_path,f"Test/{timestamp}.jpg")
             link = self.NextCloudClient.upload_file2(self.last_pic_path,f"{timestamp}.jpg")
-            self.NextCloudClient.create_qr(link,timestamp)
-            time.sleep(2)
             if self.NextCloudClient.last_upload_succesfull:
+                self.NextCloudClient.create_qr(link,timestamp)
                 if self.settings["printing"]==True:
                     self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
                     self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
@@ -650,15 +649,16 @@ class App(cevent.CEvent):
         self._current_window = self._settings_window
         self.on_render()
         ## Add text for status of NextCloud 
-        #self._settings_window.add_text(pgtext.Text("Cloud - Status:",
-        #                                            (660,690),28),"Cloud Status")
-        #self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
-        #                                           (660,730),28),"Network")
-        #self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_folder(), 
-        #                                                                                   "Erreibar " if self.NextCloudClient.get_availability() 
-        #                                                                                   else "Nicht erreichar"
-        #                                                                                   ),
-        #                                           (660,810),28),"NC-Erreichbarkeit")
+        self._settings_window.add_text(pgtext.Text("Cloud - Status:",
+                                                    (660,690),28),"Cloud Status")
+        self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
+                                                   (660,730),28),"Network")
+        
+        self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.nc_folder, 
+                                                                                           "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
+                                                                                           else "Nicht erreichbar"
+                                                                                           ),
+                                                   (660,810),28),"NC-Erreichbarkeit")
     def create_thumb_from_input(self):
         window=self._current_window
         if window.inputboxes['Zeile 2'].get_text()=="":
