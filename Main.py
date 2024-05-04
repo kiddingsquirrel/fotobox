@@ -50,10 +50,11 @@ class App(cevent.CEvent):
         # Initializing Start Situation 
         self._current_window = self._start_window
         self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary)
-        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,"Test","https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
+        self.settings = {"printing":False, "Upload":True, "usb":True, "FULLSCREEN": False,"NC-folder":"Dev-Days-2024"}  # all settings should reside in this dict
+        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],"https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
-        self.settings = {"printing":False, "Upload":True, "usb":True, "FULLSCREEN": False}  # all settings should reside in this dict
+        
 
     def on_init(self):
         os.chdir(working_dictonary)
@@ -191,20 +192,6 @@ class App(cevent.CEvent):
                                                          lambda: self.set_use_montage(False,False)), #
                                                          "pF_dF")
         self.set_use_montage(self.settings["printing"], self.settings["Upload"])
-
-        ## Manage Printer
-        self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
-                                                         (20, 850),  # (x, y) position
-                                                         self.printer_restart), 
-                                                         "printer restart")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
-                                                         (325, 850),  # (x, y) position
-                                                         self.printer_reset_counter), 
-                                                         "printer reset counter")
-        self._settings_window.add_button(pgbutton.Button("Images/settings/Tutorial_Printer.png",
-                                                         (20,770),
-                                                         self.open_tutorial_printer_window),"Tutorial Printer")
-
         ## Mange USB 
         
         self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
@@ -507,7 +494,7 @@ class App(cevent.CEvent):
             self._settings_window.buttons["pF_dT"].update_image("Images/settings/A_pF_dT.png")
         if self.settings["printing"]== False and self.settings["Upload"]==False:
             self._settings_window.buttons["pF_dF"].update_image("Images/settings/A_pF_dF.png")
-
+        self.open_settings()
 
     def save_to_usb(self,status):
         if status:
@@ -626,39 +613,62 @@ class App(cevent.CEvent):
         self._current_window = self._start_window
     
     def open_settings(self):
-        ## Add text to display status of printer
-        self._settings_window.add_text(pgtext.Text("Drucker - Status: ",
-                                                   (20,490),28),"Drucker Status")
-        self._settings_window.add_text(pgtext.Text("- Verbindung mit Drucker: {}".format("TBD"),
-                                                   (20,530),28),"Drucker Verbindung")
-        self._settings_window.add_text(pgtext.Text("- aktueller Zähler Montagen: {}".format(self.booth.print_count),
-                                                   (20,570),28),"Drucker Zähler ")
-        self._settings_window.add_text(pgtext.Text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count),
-                                                   (20,610),28),"Drucker Restkapazität")
-        self._settings_window.add_text(pgtext.Text("Drucker - Hinweis: ",
-                                                   (20,650),28),"Drucker Hinweis")
-        self._settings_window.add_text(pgtext.Text("- Toner und Papier bei Restkapazität von {} wechseln".format(40),
-                                                   (20,690),28),"Drucker Anweisung1")
-        self._settings_window.add_text(pgtext.Text("- Danach ist Neustart und Zäherreset notwendig",
-                                                   (20,730),28),"Drucker Anweisung2")
         ## Add text to display free storage of SD
         self._settings_window.add_text(pgtext.Text("Speicherort der Bilder",
                                                    (660,490),28),"Speichern")
         self._settings_window.add_text(pgtext.Text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))),
                                                    (660,640),28),"Speicherplatz")
-        self._current_window = self._settings_window
+        if self.settings["printing"]:
+            ## Manage Printer
+            self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
+                                                            (20, 850),  # (x, y) position
+                                                            self.printer_restart), 
+                                                            "printer restart")
+            self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
+                                                            (325, 850),  # (x, y) position
+                                                            self.printer_reset_counter), 
+                                                            "printer reset counter")
+            self._settings_window.add_button(pgbutton.Button("Images/settings/Tutorial_Printer.png",
+                                                            (20,770),
+                                                            self.open_tutorial_printer_window),"Tutorial Printer")
+            ## Add text to display status of printer
+            self._settings_window.add_text(pgtext.Text("Drucker - Status: ",
+                                                    (20,490),28),"Drucker Status")
+            self._settings_window.add_text(pgtext.Text("- Verbindung mit Drucker: {}".format("TBD"),
+                                                    (20,530),28),"Drucker Verbindung")
+            self._settings_window.add_text(pgtext.Text("- aktueller Zähler Montagen: {}".format(self.booth.print_count),
+                                                    (20,570),28),"Drucker Zähler ")
+            self._settings_window.add_text(pgtext.Text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count),
+                                                    (20,610),28),"Drucker Restkapazität")
+            self._settings_window.add_text(pgtext.Text("Drucker - Hinweis: ",
+                                                    (20,650),28),"Drucker Hinweis")
+            self._settings_window.add_text(pgtext.Text("- Toner und Papier bei Restkapazität von {} wechseln".format(40),
+                                                    (20,690),28),"Drucker Anweisung1")
+            self._settings_window.add_text(pgtext.Text("- Danach ist Neustart und Zäherreset notwendig",
+                                                    (20,730),28),"Drucker Anweisung2")
+        if self.settings["Upload"]:
+            ## Add text for status of NextCloud 
+            self._settings_window.add_text(pgtext.Text("Cloud - Status:",
+                                                        (660,690),28),"Cloud Status")
+            self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
+                                                    (660,730),28),"Network")
+            self._settings_window.add_text(pgtext.Text("-Next-Cloud Ordner:",(660,770),28),"NC-Folder")
+            self._settings_window.add_inputbox(pginputbox.InputBox((970,750),(300,40),self.NextCloudClient.get_nc_folder(),
+                                                                    self.update_NC_folder),"Input NC-Folder")
+            self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_nc_folder(), 
+                                                                                            "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
+                                                                                            else "Nicht erreichbar"
+                                                                                            ),
+                                                    (660,810),28),"NC-Erreichbarkeit")
+        self._current_window= self._settings_window
         self.on_render()
-        ## Add text for status of NextCloud 
-        self._settings_window.add_text(pgtext.Text("Cloud - Status:",
-                                                    (660,690),28),"Cloud Status")
-        self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
-                                                   (660,730),28),"Network")
-        
-        self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.nc_folder, 
-                                                                                           "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
-                                                                                           else "Nicht erreichbar"
-                                                                                           ),
-                                                   (660,810),28),"NC-Erreichbarkeit")
+    def update_NC_folder(self):
+        window = self._current_window
+        c_folder_name = str(window.inputboxes["Input NC-Folder"].get_text())
+        self.NextCloudClient.create_folder(c_folder_name)
+        print(f"Created: {c_folder_name}")
+        print(self.NextCloudClient.get_nc_folder())
+        self.open_settings()
     def create_thumb_from_input(self):
         window=self._current_window
         if window.inputboxes['Zeile 2'].get_text()=="":

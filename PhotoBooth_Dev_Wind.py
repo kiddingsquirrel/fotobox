@@ -10,14 +10,15 @@ from pathlib import Path
 class NextCloudClient:
     def __init__(self,base_path,nc_folder, url, user, password):
         self.basepath = base_path
-        self.nc_folder = nc_folder
         self.url= url
         self.user = user
         self.password = password
-        self.connect_client()
+        self.nc_folder=self.create_folder(nc_folder)
         self.current_link = None
         self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
         self.last_upload_succesfull = False
+    def get_nc_folder(self):
+        return self.nc_folder
     def connect_client(self):
         try:
             self.client = Nextcloud(nextcloud_url = self.url,nc_auth_user=self.user, nc_auth_pass=self.password)
@@ -36,6 +37,31 @@ class NextCloudClient:
         except Exception as e:
             print(e)
             self.nc_available = False
+    def create_folder(self,folder_name):
+        try:
+            # Connect to the Nect-Cloud Clinet 
+            self.connect_client()
+            if self.nc_available:
+                # check if the folder already exist
+                if self.check_folder_exist(folder_name):
+                    print("Folder already exist")
+                    return folder_name
+                else:
+                    # Create folder
+                    try:
+                        self.client.files.mkdir(str(folder_name))
+                        self.nc_folder=folder_name
+                        print(f"Created folder: {folder_name} at NC-Instance")
+                    except Exception as e:
+                        print(f"Error creating folder:{folder_name}")
+                        print(e)
+                        return None
+            else:
+                print("Next-Cloud is not available")
+                return None
+        except Exception as e:
+            print(e)
+            return None
     def check_folder_exist(self, folder_name):
         try:
             all_files_folders = self.client.files.listdir(depth=1)
