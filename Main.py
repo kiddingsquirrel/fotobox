@@ -16,6 +16,7 @@ pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox # pygame.init() has to be before import pginputbox !!!!
 import pgtext
 import PhotoBooth_Dev_Wind
+import socket
 
 
 
@@ -50,7 +51,7 @@ class App(cevent.CEvent):
         self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,"Test","https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
-        self.settings = {"printing":False, "Upload":False, "usb":True, "FULLSCREEN": False}  # all settings should reside in this dict
+        self.settings = {"printing":False, "Upload":True, "usb":True, "FULLSCREEN": False}  # all settings should reside in this dict
 
     def on_init(self):
         os.chdir(working_dictonary)
@@ -77,6 +78,13 @@ class App(cevent.CEvent):
         #self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(0,60),28),"Anweisung1")
         #### HIER WEITER ARBEITEN 
         # After Capture Screens - Adding buttons
+        ## With out Printing and Download
+        self._after_capture_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
+        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
+                                                      (275,785),
+                                                      self.set_start),
+                                                      "zurück")
+
         ## Printing
         self._after_capture_print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
         self._after_capture_print_window.add_button(pgbutton.Button("Images/After_Capture/Print_bWeiter.png",
@@ -593,6 +601,8 @@ class App(cevent.CEvent):
             self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
             self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
             self._current_window = self._after_capture_print_QR_window
+        elif self.settings["printing"]==False and self.settings["Upload"]==False:
+            self._current_window = self._after_capture_window
         else:
             self._current_window = self._start_window
 
@@ -622,6 +632,16 @@ class App(cevent.CEvent):
                                                    (660,640),28),"Speicherplatz")
         self._current_window = self._settings_window
         self.on_render()
+        ## Add text for status of NextCloud 
+        self._settings_window.add_text(pgtext.Text("Cloud - Status:",
+                                                    (660,690),28),"Cloud Status")
+        self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
+                                                   (660,730),28),"Network")
+        self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_folder(), 
+                                                                                           "Erreibar " if self.NextCloudClient.get_availability() 
+                                                                                           else "Nicht erreichar"
+                                                                                           ),
+                                                   (660,810),28),"NC-Erreichbarkeit")
     def create_thumb_from_input(self):
         window=self._current_window
         if window.inputboxes['Zeile 2'].get_text()=="":
@@ -631,6 +651,22 @@ class App(cevent.CEvent):
         self.booth.create_thumb(text,self.booth.get_thumb_size())
         self._current_window.images["thumbnail"].update(window.images["thumbnail"].path)
         self.on_render()
+    
+    def get_network_connection(self,host="8.8.8.8", port=53, timeout=3):
+        try:
+            # Create a socket object
+            socket.setdefaulttimeout(timeout)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            
+            # Try connecting to the host
+            s.connect((host, port))
+            
+            # If connection was successful, close the socket
+            s.close()
+            return "Connected"
+        except Exception as e:
+            print(f"An network error occurred: {e}")
+            return "Not Connected"
 if __name__ == "__main__":
     theApp = App()
     theApp.execute()

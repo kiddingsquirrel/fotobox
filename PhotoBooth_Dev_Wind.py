@@ -9,22 +9,19 @@ import qrcode
 
 class NextCloudClient:
     def __init__(self,base_path,nc_folder, url, user, password):
-        # self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
-        # print(self.client.files.sharing.available)
+        self.client = Nextcloud(nextcloud_url = url,nc_auth_user=user, nc_auth_pass=password)
+        print(self.client.files.sharing.available)
         self.folder = nc_folder
         self.basepath = base_path
         self.current_link = None
         self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
     
     def print_structure(self):
-        """
+        
         all_files_folders = self.client.files.listdir(depth=-1)
         for obj in all_files_folders:
             print(obj.user_path)
-        """
-        pass
     def upload_file(self,local_path, destination_path):
-        """
         try:
             with open(local_path,"rb") as file:
                 file_data = file.read() # Ensure that fill is read correctly 
@@ -36,11 +33,9 @@ class NextCloudClient:
         except Exception as e:
             print(f"There was a problem uploading and creating the link: {e}")
             return None
-        """
-        print("Uploaded part ")
-        pass
+        
     def create_qr(self, link, timestamp):
-        """
+        
         try:
             qr = qrcode.QRCode(
                 version=1,
@@ -55,9 +50,9 @@ class NextCloudClient:
             print(f"Created qr-Code for {link}")
         except:
             print(f"Error creating QR-Code for {link}")
-        """
+        
         print("Created QR")
-        pass                      
+                             
 class PhotoBooth:
     
     def __init__(self,base_path):
