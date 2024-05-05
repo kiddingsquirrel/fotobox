@@ -13,5 +13,7 @@ class Text:
     def draw(self,surface):
         # Blit the text
         surface.blit(self.txt_surface,self.location)
+    def update_text(self,text):
+        self.text = text
 
 

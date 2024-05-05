@@ -191,7 +191,15 @@ class App(cevent.CEvent):
                                                          (970,350),  # (x, y) position
                                                          lambda: self.set_use_montage(False,False)), #
                                                          "pF_dF")
-        self.set_use_montage(self.settings["printing"], self.settings["Upload"])
+        # self.set_use_montage(self.settings["printing"], self.settings["Upload"])
+
+        ## Add text to display free storage of SD
+        self._settings_window.add_text(pgtext.Text("Speicherort der Bilder",
+                                                   (660,490),28),"Speichern")
+        self._settings_window.add_text(pgtext.Text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))),
+                                                   (660,640),28),"Speicherplatz")
+        
+
         ## Mange USB 
         
         self._settings_window.add_button(pgbutton.Button("Images/settings/Save_Desktop.png",
@@ -204,8 +212,68 @@ class App(cevent.CEvent):
                                                          "Save USB")
         
         
+        ## Manage Printer
+        ## Adding Buttons to Manage printer
+        self._printer_buttons= []
+        self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
+                                                            (20, 850),  # (x, y) position
+                                                            self.printer_restart,visibility=False), 
+                                                            "printer restart")
+        self._printer_buttons.append("printer restart")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
+                                                            (325, 850),  # (x, y) position
+                                                            self.printer_reset_counter,visibility=False), 
+                                                            "printer reset counter")
+        self._printer_buttons.append("printer reset counter")
+        self._settings_window.add_button(pgbutton.Button("Images/settings/Tutorial_Printer.png",
+                                                            (20,770),
+                                                            self.open_tutorial_printer_window,visibility=False),
+                                                            "Tutorial Printer")
+        self._printer_buttons.append("Tutorial Printer")
+        ## Add text to display status of printer
+        self._printer_texts= []
+        self._settings_window.add_text(pgtext.Text("Drucker - Status: ",
+                                                    (20,490),28),"Drucker Status")
+        self._printer_texts.append("Drucker Status")
+        self._settings_window.add_text(pgtext.Text("- Verbindung mit Drucker: {}".format("TBD"),
+                                                    (20,530),28),"Drucker Verbindung")
+        self._printer_texts.append("Drucker Verbindung")
+        self._settings_window.add_text(pgtext.Text("- aktueller Zähler Montagen: {}".format(self.booth.print_count),
+                                                    (20,570),28),"Drucker Zähler")
+        self._printer_texts.append("Drucker Zähler")
+        self._settings_window.add_text(pgtext.Text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count),
+                                                    (20,610),28),"Drucker Restkapazität")
+        self._printer_texts.append("Drucker Restkapazität")
+        self._settings_window.add_text(pgtext.Text("Drucker - Hinweis: ",
+                                                    (20,650),28),"Drucker Hinweis")
+        self._printer_texts.append("Drucker Hinweis")
+        self._settings_window.add_text(pgtext.Text("- Toner und Papier bei Restkapazität von {} wechseln".format(40),
+                                                    (20,690),28),"Drucker Anweisung1")
+        self._printer_texts.append("Drucker Anweisung1")
+        self._settings_window.add_text(pgtext.Text("- Danach ist Neustart und Zäherreset notwendig",
+                                                    (20,730),28),"Drucker Anweisung2")
+        self._printer_texts.append("Drucker Anweisung2")
+        ## Add text for status of NextCloud 
+        self._nc_texts = []
+        self._settings_window.add_text(pgtext.Text("Cloud - Status:",
+                                                        (660,690),28),"Cloud Status")
+        self._nc_texts.append("Cloud Status")
+        self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
+                                                    (660,730),28),"Network")
+        self._nc_texts.append("Network")
+        self._settings_window.add_text(pgtext.Text("-Next-Cloud Ordner:",(660,770),28),"NC-Folder")
+        self._nc_texts.append("NC-Folder")
+        self._settings_window.add_inputbox(pginputbox.InputBox((970,750),(300,40),self.NextCloudClient.get_nc_folder(),
+                                                                    self.update_NC_folder),"Input NC-Folder")
         
-        
+        self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_nc_folder(), 
+                                                                                            "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
+                                                                                            else "Nicht erreichbar"
+                                                                                            ),
+                                                    (660,810),28),"NC-Erreichbarkeit")
+        self._nc_texts.append("NC-Erreichbarkeit")
+
+
         # Style1 Screen - Adding Buttond and InputTextboxes
         self._style1_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (90, 30),  # (x, y) position
@@ -542,17 +610,21 @@ class App(cevent.CEvent):
     def on_render(self):
         self._display_surf.fill((0, 0, 0))  # clear all img
         for image in self._current_window.images.values():
-            self._display_surf.blit(image.img, image.location)        
+            if image.visibility:
+                self._display_surf.blit(image.img, image.location)        
         for button in self._current_window.buttons.values():
-            self._display_surf.blit(button.img, button.location)
+            if button.visibility:
+                self._display_surf.blit(button.img, button.location)
         for box in self._current_window.inputboxes.values():
-            # Blit the text
-            text_center=box.txt_surface.get_rect(center=(int(box.size[0]/2),int(box.size[1]/2)))
-            self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
-            # Blit the rect
-            pygame.draw.rect(self._display_surf, box.color, box.rect,2)
+            if box.visibility:
+                # Blit the text
+                text_center=box.txt_surface.get_rect(center=(int(box.size[0]/2),int(box.size[1]/2)))
+                self._display_surf.blit(box.txt_surface,(box.location[0]+text_center[0],box.location[1]+text_center[1]))    
+                # Blit the rect
+                pygame.draw.rect(self._display_surf, box.color, box.rect,2)
         for text in self._current_window.texts.values():
-            self._display_surf.blit(text.txt_surface,text.location)
+            if text.visibility:
+                self._display_surf.blit(text.txt_surface,text.location)
 
         pygame.display.flip()
     def on_exit(self):
@@ -613,53 +685,40 @@ class App(cevent.CEvent):
         self._current_window = self._start_window
     
     def open_settings(self):
-        ## Add text to display free storage of SD
-        self._settings_window.add_text(pgtext.Text("Speicherort der Bilder",
-                                                   (660,490),28),"Speichern")
-        self._settings_window.add_text(pgtext.Text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))),
-                                                   (660,640),28),"Speicherplatz")
+        ## Update Speicherplatz 
+        self._settings_window.texts["Speicherplatz"].update_text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))))
+        # Set Visibility to False for all elements related to printing and nc
+        for text in self._printer_texts:
+            self._settings_window.texts[text].visibility=False
+        for button in self._printer_buttons:
+            self._settings_window.buttons[button].visibility=False
+        for text in self._nc_texts:
+            self._settings_window.texts[text].visibility=False
+        self._settings_window.inputboxes["Input NC-Folder"].visibility = False
+        # Update and set Visible elements related to printing
         if self.settings["printing"]:
-            ## Manage Printer
-            self._settings_window.add_button(pgbutton.Button("Images/settings/restart.png",
-                                                            (20, 850),  # (x, y) position
-                                                            self.printer_restart), 
-                                                            "printer restart")
-            self._settings_window.add_button(pgbutton.Button("Images/settings/Reset_Counter.png",
-                                                            (325, 850),  # (x, y) position
-                                                            self.printer_reset_counter), 
-                                                            "printer reset counter")
-            self._settings_window.add_button(pgbutton.Button("Images/settings/Tutorial_Printer.png",
-                                                            (20,770),
-                                                            self.open_tutorial_printer_window),"Tutorial Printer")
-            ## Add text to display status of printer
-            self._settings_window.add_text(pgtext.Text("Drucker - Status: ",
-                                                    (20,490),28),"Drucker Status")
-            self._settings_window.add_text(pgtext.Text("- Verbindung mit Drucker: {}".format("TBD"),
-                                                    (20,530),28),"Drucker Verbindung")
-            self._settings_window.add_text(pgtext.Text("- aktueller Zähler Montagen: {}".format(self.booth.print_count),
-                                                    (20,570),28),"Drucker Zähler ")
-            self._settings_window.add_text(pgtext.Text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count),
-                                                    (20,610),28),"Drucker Restkapazität")
-            self._settings_window.add_text(pgtext.Text("Drucker - Hinweis: ",
-                                                    (20,650),28),"Drucker Hinweis")
-            self._settings_window.add_text(pgtext.Text("- Toner und Papier bei Restkapazität von {} wechseln".format(40),
-                                                    (20,690),28),"Drucker Anweisung1")
-            self._settings_window.add_text(pgtext.Text("- Danach ist Neustart und Zäherreset notwendig",
-                                                    (20,730),28),"Drucker Anweisung2")
+            # Updating Dynamic Text
+            self._settings_window.texts["Drucker Zähler"].update_text("- aktueller Zähler Montagen: {}".format(self.booth.print_count))
+            self._settings_window.texts["Drucker Restkapazität"].update_text("- Restkapazität: {}".format(self.booth.print_max_count-self.booth.print_count))            
+            # Setting Visibility
+            for text in self._printer_texts:
+                self._settings_window.texts[text].visibility=True
+            for button in self._printer_buttons:
+                self._settings_window.buttons[button].visibility=True
+        # Update and set Visible elements related to NC-Cloud 
         if self.settings["Upload"]:
-            ## Add text for status of NextCloud 
-            self._settings_window.add_text(pgtext.Text("Cloud - Status:",
-                                                        (660,690),28),"Cloud Status")
-            self._settings_window.add_text(pgtext.Text("- Netzwerkstatus: {}".format(self.get_network_connection()),
-                                                    (660,730),28),"Network")
-            self._settings_window.add_text(pgtext.Text("-Next-Cloud Ordner:",(660,770),28),"NC-Folder")
-            self._settings_window.add_inputbox(pginputbox.InputBox((970,750),(300,40),self.NextCloudClient.get_nc_folder(),
-                                                                    self.update_NC_folder),"Input NC-Folder")
-            self._settings_window.add_text(pgtext.Text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_nc_folder(), 
+            # Updating Dynamic Elements
+            self._settings_window.texts["Network"].update_text("- Netzwerkstatus: {}".format(self.get_network_connection()))
+            self._settings_window.inputboxes["Input NC-Folder"].update_text(str(self.NextCloudClient.get_nc_folder()))
+            self._settings_window.texts["NC-Erreichbarkeit"].update_text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_nc_folder(), 
                                                                                             "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
                                                                                             else "Nicht erreichbar"
-                                                                                            ),
-                                                    (660,810),28),"NC-Erreichbarkeit")
+                                                                                            ))
+            # Setting Visibility
+            for text in self._nc_texts:
+                self._settings_window.texts[text].visibility=True
+            self._settings_window.inputboxes["Input NC-Folder"].visibility = True
+
         self._current_window= self._settings_window
         self.on_render()
     def update_NC_folder(self):

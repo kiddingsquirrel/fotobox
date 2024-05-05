@@ -21,6 +21,8 @@ class InputBox:
         self.event= event
     def get_text(self):
         return self.text
+    def update_text(self,text):
+        self.text = text
     def over_box(self, pos):
         if self.rect.collidepoint(pos):
             return True
