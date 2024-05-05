@@ -130,43 +130,20 @@ class NextCloudClient:
                              
 class PhotoBooth:
     
-    def __init__(self,base_path):
+    def __init__(self,base_path, montage_style):
         self.base_path = base_path
-        # Define some Constants: ------------------------------------
-        # Style 2 is default
-        # Image Capturing
-        self.resolution = (2340,1523) # px(width,height)  capturing
-        self.pic_size = (860,560)   # px(width,height) on montage
-        # Printing 
-        self.printer ="D80_4x6x2" #Name of the printer
-        self.slip_format = (1800,1200) # px of the paper 
-        self.paper_format = (1800, 2400) # px of paper which will be cut
-        self.print_rows= 2   # number of rows of montage on print
-        self.print_colums= 1 # number of colums of montage on print
-        # Montage
-        self.total_pics = 4 # number of pictures taken
-        self.grid_rows = 2  # number of rows on montage
-        self.grid_colums= 2 # number of columns on montage
-        self.x_offset= 25
-        self.x_space = 25      
-        self.y_space = 25
-        self.y_offset= 25
-        self.thumb = False  # Is there a thumbnail
-        self.thumb_4x1_path= os.path.join(self.base_path,"Thumbnails/4x1_Montage/thumb.png")
+        self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails','4x1_Montage','thumb.png')
         self.thumb_4x1_size= (600, 135) 
-        self.thumb_2x2_path= os.path.join(self.base_path,"Thumbnails/2x2_Montage/thumb.png")
+        self.thumb_2x2_path= os.path.join(self.base_path,'Thumbnails','2x2_Montage','thumb.png')
         self.thumb_2x2_size= (1740, 135) 
-
-        self.thumb_size = self.thumb_4x1_size
-        self.thumb_path = self.thumb_4x1_path
-        
-        self.thumb_fonts = {'Oswald':'Oswald/Oswald-VariableFont_wght.ttf',
-                            'Bentham':'Bentham/Bentham-Regular.ttf',
-                            'Flaemisch':'flaemische-kanzleischrift/Flaemische Kanzleischrift.ttf',
-                            'Lora':'Lora/Lora-VariableFont_wght.ttf',
-                            'Linux':'linux_biolinum/LinBiolinum_R.ttf',
-                            'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
-        self.thumb_font = os.path.join(self.base_path,"/Fonts/Oswald/Oswald-VariableFont_wght.ttf")
+        self.set_montage_style(montage_style) 
+        self.thumb_fonts = {'Oswald': os.path.join('Oswald','Oswald-VariableFont_wght.ttf'),
+                            'Bentham':os.path.join('Bentham','Bentham-Regular.ttf'),
+                            'Flaemisch':os.path.join('flaemische-kanzleischrift','Flaemische Kanzleischrift.ttf'),
+                            'Lora':os.path.join('Lora','Lora-VariableFont_wght.ttf'),
+                            'Linux':os.path.join('linux_biolinum','LinBiolinum_R.ttf'),
+                            'Great':os.path.join('Great_Vibes','GreatVibes-Regular.ttf')}
+        self.thumb_font = os.path.join(self.base_path,self.thumb_fonts["Oswald"])
         self.thumb_fontsize = 50 
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
@@ -186,26 +163,9 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)  
-    def load_print_count(self):
-        try:
-            with open(self.print_log_path,"r") as file:
-                count= int(file.read())
-                print(f"The current print cout is {str(count)}")
-                return count
-        except FileNotFoundError as e:
-            print(f"Error: {e}")
-            # Creat File if it doesn't exist and return 0
-            self.save_print_count(str(0))
-            return int(0)
-    def save_print_count(self,count):
-        with open(self.print_log_path,"w") as file:
-            file.write(str(count))        
-    def get_thumb_status(self):
-        return self.thumb
-    def get_thumb_size(self):
-        return self.thumb_size
-    def style_set(self,style):
-        if style == 1: #4Bilder + Thumbnail - 4x6*2 Paper Slipe
+    def set_montage_style(self,montage_style):
+        self.montage_style= montage_style
+        if self.montage_style == 1: 
             # Image Capturing
             self.resolution = (2340,1316) # px(width,height)  capturing
             self.pic_size = (860,480)   # px(width,height) on montage
@@ -226,7 +186,7 @@ class PhotoBooth:
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = self.thumb_2x2_size # px of thumbnail image
             self.thumb_path = self.thumb_2x2_path# path to the thumbnail
-        if style == 2: #4Bilder
+        if self.montage_style == 2:
             # Image Capturing
             self.resolution = (2340,1523) # px(width,height)  capturing
             self.pic_size = (860,560)   # px(width,height) on montage
@@ -243,7 +203,9 @@ class PhotoBooth:
             self.y_space = 25
             self.y_offset= 25
             self.thumb = False  # Is there a thumbnail
-        if style == 3: # 4 Bilder + Thumbnail - 2x6*2 Paper Slipe
+            self.thumb_size = self.thumb_2x2_size # px of thumbnail image
+            self.thumb_path = self.thumb_2x2_path# path to the thumbnail
+        if self.montage_style == 3:
             # Image Capturing
             self.resolution = (2340,1523) #self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png") px(width,height)  capturing
             self.pic_size = (530,350)   # px(width,height) on montage
@@ -264,7 +226,25 @@ class PhotoBooth:
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = self.thumb_4x1_size# px of thumbnail image
             self.thumb_path = self.thumb_4x1_path # path to the thumbnail
-
+    def load_print_count(self):
+        try:
+            with open(self.print_log_path,"r") as file:
+                count= int(file.read())
+                print(f"The current print cout is {str(count)}")
+                return count
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
+            # Creat File if it doesn't exist and return 0
+            self.save_print_count(str(0))
+            return int(0)
+    def save_print_count(self,count):
+        with open(self.print_log_path,"w") as file:
+            file.write(str(count))        
+    def get_thumb_status(self):
+        return self.thumb
+    def get_thumb_size(self):
+        return self.thumb_size
+    
     def show_image(self, image_path):
         pygame.init()
         pygame.display.set_caption('Photo Booth Pics')

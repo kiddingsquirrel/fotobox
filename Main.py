@@ -35,23 +35,28 @@ class App(cevent.CEvent):
         self._after_capture_QR_window = pgwindow.Window(self.size)          # Screen with Montage, QR-Code and Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==True
         self._after_capture_print_window = pgwindow.Window(self.size)       # Screen with Montage, Button to print and Button to go back to start -> Displayed at self.settings["printing"]==True and self.settings["QR"]==False
         self._after_capture_print_QR_window = pgwindow.Window(self.size)    # Screen with Montage, QR-Code, Button to print and Button to go back to start -> Displayed at self.settings["printing"]== True and self.settings["QR"]==True
-        self._printing_window = pgwindow.Window(self.size)
-        
-        self._QR_window = pgwindow.Window(self.size)                        # Do i really need it ? 
+        self._printing_window = pgwindow.Window(self.size) 
         self._printing_QR_window = pgwindow.Window(self.size)               # Do i really need it ? 
         # Initialize Screens - Handling Erros - but Insure User - Images are Saved
-        self._QR_failed_window = pgwindow.Window(self.size)                 # Do i really need it ? 
         self._printing_failed_window = pgwindow.Window(self.size)           # Do i really need it ?
         # Optimizing User Experience                                        
         self._settings_window = pgwindow.Window(self.size)                  # Display for user to configure Box for the event
-        self._style1_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 1 
-        self._style2_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 2
-        self._style3_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 3
+        self._set_montage_window = pgwindow.Window(self.size)               # Display for user to configure Montage
+        self._style1_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 1 -> to be deleted later
+        self._style2_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 2 -> to be deleted later
+        self._style3_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 3 -> to be deleted later
         # Initializing Start Situation 
         self._current_window = self._start_window
-        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary)
-        self.settings = {"printing":False, "Upload":True, "usb":True, "FULLSCREEN": False,"NC-folder":"Dev-Days-2024"}  # all settings should reside in this dict
-        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],"https://nc-8872520695452827614.nextcloud-ionos.com/","boxjoni","FUUhJw0NTnXw")
+        
+        self.settings = {"printing":False, "Upload":True, "usb":True,
+                          "FULLSCREEN": False,
+                          "montage_style": 2,
+                         "NC-folder":"Dev-Days-2024", 
+                         "nc-url":"https://nc-8872520695452827614.nextcloud-ionos.com/",
+                         "nc_user":"boxjoni",
+                         "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
+        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
+        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"])
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -168,7 +173,7 @@ class App(cevent.CEvent):
                                                          "preview")
         self._settings_window.add_button(pgbutton.Button("Images/settings/Set_Layout.png",
                                                          (650, 165),  # (x, y) position
-                                                         self.open_style_1_window),
+                                                         self.open_set_montage_window),
                                                          "Weiter thumbnail")  
         
         ## Manage Use of Montage
@@ -191,7 +196,7 @@ class App(cevent.CEvent):
                                                          (970,350),  # (x, y) position
                                                          lambda: self.set_use_montage(False,False)), #
                                                          "pF_dF")
-        # self.set_use_montage(self.settings["printing"], self.settings["Upload"])
+        
 
         ## Add text to display free storage of SD
         self._settings_window.add_text(pgtext.Text("Speicherort der Bilder",
@@ -272,202 +277,107 @@ class App(cevent.CEvent):
                                                                                             ),
                                                     (660,810),28),"NC-Erreichbarkeit")
         self._nc_texts.append("NC-Erreichbarkeit")
-
-
-        # Style1 Screen - Adding Buttond and InputTextboxes
-        self._style1_window.add_button(pgbutton.Button("Images/settings/Back.png",
+        # Set Montage Window
+        ## Add Buttons User-Experience
+        self._set_montage_window.add_button(pgbutton.Button("Images/settings/Back.png",
                                                          (90, 30),  # (x, y) position
                                                          self.open_settings), # anchor
                                                          "back")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
                                                          (500, 30),  # (x, y) position
                                                          self.set_start), # anchor
                                                          "Set Start")
-        self._style1_window.add_button(pgbutton.Button("Images/settings/close.png",
+        self._set_montage_window.add_button(pgbutton.Button("Images/settings/close.png",
                                                          (900, 30),  # (x, y) position
                                                          self.on_cleanup),
                                                          "exit")
-        self._style1_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
+        ## Add Buttons for user to choose the style
+        self._set_montage_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
                                                         (560,160),
                                                         (156,36)),
                                                         "Drucklayout")
-        self._style1_window.add_button(pgbutton.Button("Images/style/style_1_active.png",
+        self._style_buttons = []
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/style_1.png",
                                                          (90, 205),  # (x, y) position
-                                                         self.open_style_1_window), 
+                                                         lambda: self.set_style_montage(1)), 
                                                          "style_1")
-        self._style1_window.add_button(pgbutton.Button("Images/style/style_2.png",
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/style_2.png",
                                                          (500, 205),  # (x, y) position
-                                                         self.open_style_2_window), 
+                                                         lambda: self.set_style_montage(2)), 
                                                          "style_2")
-        self._style1_window.add_button(pgbutton.Button("Images/style/style_3.png",
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/style_3.png",
                                                          (900, 205),  # (x, y) position
-                                                         self.open_style_3_window), 
+                                                         lambda: self.set_style_montage(3)), 
                                                          "style_3")
-        self._style1_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
+        ## Add Elements for user to adjust the thumbnail
+        self._thumb_images = []
+        self._set_montage_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
                                                         (525,615),
                                                         (220,38)),
                                                         "Thumbnaildesign")
-        self._style1_window.add_image(pgimage.Image(self.booth.thumb_2x2_path,(205,660),(870,68)),"thumbnail")
-        self._style1_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),'Zeile 1')
-        self._style1_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),'Zeile 2')
-        self._style1_window.add_image(pgimage.Image("Images/style/Zeile1.png",
+        self._thumb_images.append("Thumbnaildesign")
+        self._set_montage_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(870,68)),"thumbnail")
+        self._thumb_images.append("thumbnail")
+        self._set_montage_window.add_image(pgimage.Image("Images/style/Zeile1.png",
                                                     (90,840),
                                                     (95,35)),
                                                     "Text Zeile 1")
-        self._style1_window.add_image(pgimage.Image("Images/style/Zeile2.png",
+        self._thumb_images.append("Text Zeile 1")
+        self._set_montage_window.add_image(pgimage.Image("Images/style/Zeile2.png",
                                                     (90,910),
                                                     (95,35)),
                                                     "Text Zeile 2")
-        ## Font Management 
-                            
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
+        self._thumb_images.append("Text Zeile 2")
+        self._thumb_input_boxes = []
+        self._set_montage_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),'Zeile 1')
+        self._thumb_input_boxes.append('Zeile 1')
+        self._set_montage_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),'Zeile 2')
+        self._thumb_input_boxes.append("Zeile 2")
+        self._thumb_buttons = []
+        ## Add Elements for Font Management 
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
                                                        (650, 840),  # (x, y) position
                                                        self.set_font_up), 
                                                        "Font Up")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
+        self._thumb_buttons.append("Font Up")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
                                                          (650, 910),  # (x, y) position
                                                          self.set_font_down), 
                                                          "Font Down")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
+        self._thumb_buttons.append("Font Down")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
                                                          (740, 840),  # (x, y) position
                                                          lambda: self.set_font("Oswald")), 
                                                          "Oswald")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
+        self._thumb_buttons.append("Oswald")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
                                                          (920, 840),  # (x, y) position
                                                          lambda: self.set_font("Bentham")), 
                                                          "Bentham")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
+        self._thumb_buttons.append("Bentham")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
                                                          (1100, 840),  # (x, y) position
                                                          lambda: self.set_font("Flaemisch")), 
                                                          "Flaemisch")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
+        self._thumb_buttons.append("Flaemisch")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
                                                          (740, 910),  # (x, y) position
                                                          lambda: self.set_font("Lora")), 
                                                          "Lora")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
+        self._thumb_buttons.append("Lora")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
                                                          (920, 910),  # (x, y) position
                                                          lambda: self.set_font("Linux")), 
                                                          "Linux")
-        self._style1_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
+        self._thumb_buttons.append("Linux")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
                                                          (1100, 910),  # (x, y) position
                                                          lambda: self.set_font("Great")), 
-                                                         "Great")                                                         
-               
-        
-        # Style2 Screen - Adding Buttond and InputTextboxes
-        self._style2_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (90, 30),  # (x, y) position
-                                                         self.open_settings), # anchor
-                                                         "back")
-        self._style2_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
-                                                         (500, 30),  # (x, y) position
-                                                         self.set_start), # anchor
-                                                         "Set Start")
-        self._style2_window.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (900, 30),  # (x, y) position
-                                                         self.on_cleanup),
-                                                         "exit")
-        self._style2_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
-                                                        (560,160),
-                                                        (156,36)),
-                                                        "Drucklayout")
-        self._style2_window.add_button(pgbutton.Button("Images/style/style_1.png",
-                                                         (90, 205),  # (x, y) position
-                                                         self.open_style_1_window), 
-                                                         "style_1")
-        self._style2_window.add_button(pgbutton.Button("Images/style/style_2_active.png",
-                                                         (500, 205),  # (x, y) position
-                                                         self.open_style_2_window), 
-                                                         "style_2")
-        self._style2_window.add_button(pgbutton.Button("Images/style/style_3.png",
-                                                         (900, 205),  # (x, y) position
-                                                         self.open_style_3_window), 
-                                                         "style_3")   
-        # Style1 Screen - Adding Buttond and InputTextboxes
-        self._style3_window.add_button(pgbutton.Button("Images/settings/Back.png",
-                                                         (90, 30),  # (x, y) position
-                                                         self.open_settings), # anchor
-                                                         "back")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Back_Foto.png",
-                                                         (500, 30),  # (x, y) position
-                                                         self.set_start), # anchor
-                                                         "Set Start")
-        self._style3_window.add_button(pgbutton.Button("Images/settings/close.png",
-                                                         (900, 30),  # (x, y) position
-                                                         self.on_cleanup),
-                                                         "exit")
-        self._style3_window.add_image(pgimage.Image("Images/style/Drucklayout.png",
-                                                        (560,160),
-                                                        (156,36)),
-                                                        "Drucklayout")
-        self._style3_window.add_button(pgbutton.Button("Images/style/style_1.png",
-                                                         (90, 205),  # (x, y) position
-                                                         self.open_style_1_window), 
-                                                         "style_1")
-        self._style3_window.add_button(pgbutton.Button("Images/style/style_2.png",
-                                                         (500, 205),  # (x, y) position
-                                                         self.open_style_2_window), 
-                                                         "style_2")
-        self._style3_window.add_button(pgbutton.Button("Images/style/style_3_active.png",
-                                                         (900, 205),  # (x, y) position
-                                                         self.open_style_3_window), 
-                                                         "style_3")
-        self._style3_window.add_image(pgimage.Image("Images/style/Thumbnaildesign.png",
-                                                        (525,615),
-                                                        (220,38)),
-                                                        "Thumbnaildesign")
-        self._style3_window.add_image(pgimage.Image(self.booth.thumb_4x1_path,(335,660),self.booth.thumb_4x1_size),"thumbnail")
-        self._style3_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),"Zeile 1")
-        self._style3_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),"Zeile 2") 
-        self._style3_window.add_image(pgimage.Image("Images/style/Zeile1.png",
-                                                    (90,840),
-                                                    (95,35)),
-                                                    "Zeile 1")
-        self._style3_window.add_image(pgimage.Image("Images/style/Zeile2.png",
-                                                    (90,910),
-                                                    (95,35)),
-                                                    "Zeile 2")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
-                                                       (650, 840),  # (x, y) position
-                                                       self.set_font_up), 
-                                                       "Font Up")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
-                                                         (650, 910),  # (x, y) position
-                                                         self.set_font_down), 
-                                                         "Font Down")
-        ## Font Management 
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
-                                                       (650, 840),  # (x, y) position
-                                                       self.set_font_up), 
-                                                       "Font Up")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
-                                                         (650, 910),  # (x, y) position
-                                                         self.set_font_down), 
-                                                         "Font Down")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
-                                                         (740, 840),  # (x, y) position
-                                                         lambda: self.set_font("Oswald")), 
-                                                         "Oswald")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
-                                                         (920, 840),  # (x, y) position
-                                                         lambda: self.set_font("Bentham")), 
-                                                         "Bentham")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
-                                                         (1100, 840),  # (x, y) position
-                                                         lambda: self.set_font("Flaemisch")), 
-                                                         "Flaemisch")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
-                                                         (740, 910),  # (x, y) position
-                                                         lambda: self.set_font("Lora")), 
-                                                         "Lora")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
-                                                         (920, 910),  # (x, y) position
-                                                         lambda: self.set_font("Linux")), 
-                                                         "Linux")
-        self._style3_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
-                                                         (1100, 910),  # (x, y) position
-                                                         lambda: self.set_font("Great")), 
-                                                         "Great")     
+                                                         "Great")
+        self._thumb_buttons.append("Great")
+        self.set_use_montage(self.settings["printing"], self.settings["Upload"])
+        self.set_font("Oswald")
+        self._current_window = self._start_window     
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -516,30 +426,51 @@ class App(cevent.CEvent):
         self.open_settings()
     def open_tutorial_printer_window(self):
         pass # tbd.
-    def open_style_1_window(self):
-        self.booth.style_set(1)
-        self._current_window = self._style1_window
+    def open_set_montage_window(self):
+        for button in self._thumb_buttons:
+            self._set_montage_window.buttons[button].visibility=False
+        for image in self._thumb_images:
+            self._set_montage_window.images[image].visibility = False
+        for inputbox in self._thumb_input_boxes:
+            self._set_montage_window.inputboxes[inputbox].visibility = False
+        if self.booth.thumb:
+            
+            if self.booth.montage_style==1:
+                self._set_montage_window.images["thumbnail"].location= (205,660)
+                self._set_montage_window.images["thumbnail"].size=(870,68)
+            if self.booth.montage_style==3:
+                self._set_montage_window.images["thumbnail"].location= (500,660)
+                self._set_montage_window.images["thumbnail"].size=(305,68)
+            self._set_montage_window.images["thumbnail"].update(self.booth.thumb_path)
+            for button in self._thumb_buttons:
+                self._set_montage_window.buttons[button].visibility=True
+            for image in self._thumb_images:
+                self._set_montage_window.images[image].visibility = True
+            for inputbox in self._thumb_input_boxes:
+                self._set_montage_window.inputboxes[inputbox].visibility = True 
+        self._current_window= self._set_montage_window
         self.on_render()
-    def open_style_2_window(self):
-        self.booth.style_set(2)
-        self._current_window = self._style2_window
-        self.on_render()
-    def open_style_3_window(self):
-        self.booth.style_set(3)
-        self._current_window = self._style3_window
-        self.on_render()
+    def set_style_montage(self,style):
+        self._set_montage_window.buttons[f"style_{style}"].update_image(f"Images/style/style_{str(style)}_active.png")
+        other_styles = [num for num in range(1, 4) if num != style]
+        for c_style in other_styles:
+            self._set_montage_window.buttons[f"style_{c_style}"].update_image(f"Images/style/style_{str(c_style)}.png")
+        self.booth.set_montage_style(style)
+        self.open_set_montage_window()
     def open_QR_window(self):
         # tbd.
         pass
     def set_font(self,font_key):
         # Adjust the current thumb_font
-        self.booth.thumb_font=os.path.join(working_dictonary,"Fonts",self.booth.thumb_fonts[font_key])
+        self.booth.thumb_font=os.path.join(self.booth.base_path,"Fonts",self.booth.thumb_fonts[font_key])
+        #self.booth.thumb_font=self.booth.base_path+str(r"\\Fonts\\")+self.booth.thumb_fonts[font_key]
+        print(self.booth.thumb_font)
         # Highlight/ activate the current font button on current screen 
-        self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png")
+        self._set_montage_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png")
         # Deactivate all other font buttons on current screen 
         other_keys = {key : value for key, value in self.booth.thumb_fonts.items() if key != font_key}
         for key in other_keys:
-            self._current_window.buttons[key].update_image("Images/style/Font_"+str(key)+".png")
+            self._set_montage_window.buttons[key].update_image("Images/style/Font_"+str(key)+".png")
         self.create_thumb_from_input() 
     def set_font_up(self):
         self.booth.thumb_fontsize +=4
@@ -660,6 +591,7 @@ class App(cevent.CEvent):
             if self.NextCloudClient.last_upload_succesfull:
                 self.NextCloudClient.create_qr(link,timestamp)
                 if self.settings["printing"]==True:
+                    
                     self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
                     self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
                     self._current_window = self._after_capture_print_QR_window
@@ -729,15 +661,13 @@ class App(cevent.CEvent):
         print(self.NextCloudClient.get_nc_folder())
         self.open_settings()
     def create_thumb_from_input(self):
-        window=self._current_window
+        window=self._set_montage_window
         if window.inputboxes['Zeile 2'].get_text()=="":
             text= str(window.inputboxes['Zeile 1'].get_text()) 
         else:
             text= str(window.inputboxes['Zeile 1'].get_text()) + str("\n")+ str(window.inputboxes['Zeile 2'].get_text())
         self.booth.create_thumb(text,self.booth.get_thumb_size())
-        self._current_window.images["thumbnail"].update(window.images["thumbnail"].path)
-        self.on_render()
-    
+        self.open_set_montage_window()
     def get_network_connection(self,host="8.8.8.8", port=53, timeout=3):
         try:
             # Create a socket object
