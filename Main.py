@@ -30,15 +30,9 @@ class App(cevent.CEvent):
         self._start_window = pgwindow.Window(self.size)                     # Welcome Screen with button to start the PhotoBox
         self._capture_window = pgwindow.Window(self.size)                   # Black-Screen on which Camera Images is overlaided
         self._after_capture_window = pgwindow.Window(self.size)
-
         # Screens to handle displaying and usage of the images 
         self._development_window = pgwindow.Window(self.size)
-                 
-        self._after_capture_QR_window = pgwindow.Window(self.size)          # Screen with Montage, QR-Code and Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==True
-        self._after_capture_print_window = pgwindow.Window(self.size)       # Screen with Montage, Button to print and Button to go back to start -> Displayed at self.settings["printing"]==True and self.settings["QR"]==False
-        self._after_capture_print_QR_window = pgwindow.Window(self.size)    # Screen with Montage, QR-Code, Button to print and Button to go back to start -> Displayed at self.settings["printing"]== True and self.settings["QR"]==True
         self._printing_window = pgwindow.Window(self.size) 
-        self._printing_QR_window = pgwindow.Window(self.size)               # Do i really need it ? 
         # Initialize Screens - Handling Erros - but Insure User - Images are Saved
         self._printing_failed_window = pgwindow.Window(self.size)           # Do i really need it ?
         # Optimizing User Experience                                        
@@ -90,62 +84,22 @@ class App(cevent.CEvent):
         #self._settings_window.add_text(pgtext.Text("Wechsel bitte die Papierrolle und Toner, wenn nur noch {} Bilder gedruckt werden können".format(40),(0,60),28),"Anweisung1")
         #### HIER WEITER ARBEITEN 
         # After Capture Screens - Adding buttons
-        ## With out Printing and Download
         self._after_capture_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
+        self._after_capture_window.add_image(pgimage.Image("Images/After_Capture/Qr_explain.png",
+                                                (140,755),
+                                                (645,100),visibility=False),
+                                                "Erklärung")
+        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Print_b1.png",
+                                                      (667,785), self.printone,visibility=False),
+                                                      "drucken")
         self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
                                                       (275,785),
-                                                      self.set_start),
-                                                      "zurück")
-
-        ## Printing
-        self._after_capture_print_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
-        self._after_capture_print_window.add_button(pgbutton.Button("Images/After_Capture/Print_bWeiter.png",
-                                                      (140,785),
-                                                      self.set_start),
-                                                      "zurück")
-        self._after_capture_print_window.add_button(pgbutton.Button("Images/After_Capture/Print_b1.png",
-                                                      (667,785), self.printone,),
-                                                      "print once")
-              
-        # After Capture QR Screen 
-        self._after_capture_QR_window.add_image(pgimage.Image(self.last_montage_path,
-                                                              (140,30),
-                                                              (1000,667)),
-                                                              "Montage")
-        self._after_capture_QR_window.add_image(pgimage.Image("Images/After_Capture/Qr_explain.png",
-                                                (140,755),
-                                                (645,100)),
-                                                "Text")
-        self._after_capture_QR_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
-                                                                    (890,745),
-                                                                    (250,250)),
-                                                                    "QR")
-        self._after_capture_QR_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
-                                                      (140,875),
-                                                      self.set_start),
+                                                      self.set_start,visibility=False),
                                                       "weiter")
-        #  After Capture Printing QR - Screen
-        self._after_capture_print_QR_window.add_image(pgimage.Image(self.last_montage_path,
-                                                                    (140,55),
-                                                                    (1000,667)),
-                                                                    "Montage")
-        self._after_capture_print_QR_window.add_image(pgimage.Image("Images/After_Capture/Print_Qr_explain.png",
-                                                                    (140,750),
-                                                                    (650,88)),
-                                                                    "Text")
-        self._after_capture_print_QR_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
+        self._after_capture_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
                                                                     (890,745),
-                                                                    (250,250)),
-                                                                    "QR")
-        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/After_Capture/Print_Qr_bWeiter.png",
-                                                      (140,875),
-                                                      self.set_start),
-                                                      "weiter")
-        self._after_capture_print_QR_window.add_button(pgbutton.Button("Images/After_Capture/Print_Qr_b1.png",
-                                                      (516,875), self.printone,),
-                                                      "print once")
-        
-
+                                                                    (250,250),visibility=False),
+                                                                    "QR-Code")
         # Printing Screen 
         self._printing_window.add_image(pgimage.Image("Images/Printing.png",
                                                       (400,318),
