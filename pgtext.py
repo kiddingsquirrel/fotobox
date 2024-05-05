@@ -1,7 +1,8 @@
 import pygame
 
 class Text:
-    def __init__(self,text,location,fontsize=16,color="white",font= None):
+    def __init__(self,text,location,fontsize=16,color="white",font= None,visibility=True):
+        self.visibility=visibility
         self.text=text
         self.location = location
         self.font=font
