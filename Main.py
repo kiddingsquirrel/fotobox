@@ -29,9 +29,11 @@ class App(cevent.CEvent):
         # Initialize Screens - Basic Functionality
         self._start_window = pgwindow.Window(self.size)                     # Welcome Screen with button to start the PhotoBox
         self._capture_window = pgwindow.Window(self.size)                   # Black-Screen on which Camera Images is overlaided
+        self._after_capture_window = pgwindow.Window(self.size)
+
         # Screens to handle displaying and usage of the images 
         self._development_window = pgwindow.Window(self.size)
-        self._after_capture_window = pgwindow.Window(self.size)             # Screen with Montage, Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==False             
+                 
         self._after_capture_QR_window = pgwindow.Window(self.size)          # Screen with Montage, QR-Code and Button to go back to start -> Displayed at self.settings["printing"]== False and self.settings["QR"]==True
         self._after_capture_print_window = pgwindow.Window(self.size)       # Screen with Montage, Button to print and Button to go back to start -> Displayed at self.settings["printing"]==True and self.settings["QR"]==False
         self._after_capture_print_QR_window = pgwindow.Window(self.size)    # Screen with Montage, QR-Code, Button to print and Button to go back to start -> Displayed at self.settings["printing"]== True and self.settings["QR"]==True
@@ -42,21 +44,19 @@ class App(cevent.CEvent):
         # Optimizing User Experience                                        
         self._settings_window = pgwindow.Window(self.size)                  # Display for user to configure Box for the event
         self._set_montage_window = pgwindow.Window(self.size)               # Display for user to configure Montage
-        self._style1_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 1 -> to be deleted later
-        self._style2_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 2 -> to be deleted later
-        self._style3_window = pgwindow.Window(self.size)                    # Display set Montage Style -> Style 3 -> to be deleted later
         # Initializing Start Situation 
         self._current_window = self._start_window
         
         self.settings = {"printing":False, "Upload":True, "usb":True,
-                          "FULLSCREEN": False,
-                          "montage_style": 2,
+                         "FULLSCREEN": False,
+                         "montage_thumb_text" : "Dev Days 2024",
+                         "montage_style": 2,
                          "NC-folder":"Dev-Days-2024", 
                          "nc-url":"https://nc-8872520695452827614.nextcloud-ionos.com/",
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
         self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
-        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"])
+        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"], self.settings["montage_thumb_text"])
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -375,9 +375,7 @@ class App(cevent.CEvent):
                                                          lambda: self.set_font("Great")), 
                                                          "Great")
         self._thumb_buttons.append("Great")
-        self.set_use_montage(self.settings["printing"], self.settings["Upload"])
-        self.set_font("Oswald")
-        self._current_window = self._start_window     
+   
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
     #         self._running = False
@@ -481,18 +479,6 @@ class App(cevent.CEvent):
     def set_use_montage(self, b_printing, b_upload):
         self.settings["printing"]=b_printing
         self.settings["Upload"]=b_upload
-        self._settings_window.buttons["pT_dF"].update_image("Images/settings/NA_pT_dF.png")
-        self._settings_window.buttons["pT_dT"].update_image("Images/settings/NA_pT_dT.png")
-        self._settings_window.buttons["pF_dT"].update_image("Images/settings/NA_pF_dT.png")
-        self._settings_window.buttons["pF_dF"].update_image("Images/settings/NA_pF_dF.png")
-        if self.settings["printing"]== True and self.settings["Upload"]==False:
-            self._settings_window.buttons["pT_dF"].update_image("Images/settings/A_pT_dF.png")
-        if self.settings["printing"]== True and self.settings["Upload"]==True:
-            self._settings_window.buttons["pT_dT"].update_image("Images/settings/A_pT_dT.png")
-        if self.settings["printing"]== False and self.settings["Upload"]==True:
-            self._settings_window.buttons["pF_dT"].update_image("Images/settings/A_pF_dT.png")
-        if self.settings["printing"]== False and self.settings["Upload"]==False:
-            self._settings_window.buttons["pF_dF"].update_image("Images/settings/A_pF_dF.png")
         self.open_settings()
 
     def save_to_usb(self,status):
@@ -591,7 +577,7 @@ class App(cevent.CEvent):
             if self.NextCloudClient.last_upload_succesfull:
                 self.NextCloudClient.create_qr(link,timestamp)
                 if self.settings["printing"]==True:
-                    
+
                     self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
                     self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
                     self._current_window = self._after_capture_print_QR_window
@@ -617,6 +603,19 @@ class App(cevent.CEvent):
         self._current_window = self._start_window
     
     def open_settings(self):
+        # Update Buttons to decide how to provide montage  
+        self._settings_window.buttons["pT_dF"].update_image("Images/settings/NA_pT_dF.png")
+        self._settings_window.buttons["pT_dT"].update_image("Images/settings/NA_pT_dT.png")
+        self._settings_window.buttons["pF_dT"].update_image("Images/settings/NA_pF_dT.png")
+        self._settings_window.buttons["pF_dF"].update_image("Images/settings/NA_pF_dF.png")
+        if self.settings["printing"]== True and self.settings["Upload"]==False:
+            self._settings_window.buttons["pT_dF"].update_image("Images/settings/A_pT_dF.png")
+        if self.settings["printing"]== True and self.settings["Upload"]==True:
+            self._settings_window.buttons["pT_dT"].update_image("Images/settings/A_pT_dT.png")
+        if self.settings["printing"]== False and self.settings["Upload"]==True:
+            self._settings_window.buttons["pF_dT"].update_image("Images/settings/A_pF_dT.png")
+        if self.settings["printing"]== False and self.settings["Upload"]==False:
+            self._settings_window.buttons["pF_dF"].update_image("Images/settings/A_pF_dF.png")
         ## Update Speicherplatz 
         self._settings_window.texts["Speicherplatz"].update_text("- aktueller Restspeicherplatz: {} Gb.".format(str(round(self.get_free_system_space(),2))))
         # Set Visibility to False for all elements related to printing and nc
@@ -650,7 +649,7 @@ class App(cevent.CEvent):
             for text in self._nc_texts:
                 self._settings_window.texts[text].visibility=True
             self._settings_window.inputboxes["Input NC-Folder"].visibility = True
-
+        
         self._current_window= self._settings_window
         self.on_render()
     def update_NC_folder(self):

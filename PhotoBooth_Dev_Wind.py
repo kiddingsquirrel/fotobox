@@ -130,7 +130,7 @@ class NextCloudClient:
                              
 class PhotoBooth:
     
-    def __init__(self,base_path, montage_style):
+    def __init__(self,base_path, montage_style, thumb_text):
         self.base_path = base_path
         self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails','4x1_Montage','thumb.png')
         self.thumb_4x1_size= (600, 135) 
@@ -143,8 +143,9 @@ class PhotoBooth:
                             'Lora':os.path.join('Lora','Lora-VariableFont_wght.ttf'),
                             'Linux':os.path.join('linux_biolinum','LinBiolinum_R.ttf'),
                             'Great':os.path.join('Great_Vibes','GreatVibes-Regular.ttf')}
-        self.thumb_font = os.path.join(self.base_path,self.thumb_fonts["Oswald"])
+        self.thumb_font = os.path.join(self.base_path,'Fonts',self.thumb_fonts["Oswald"])
         self.thumb_fontsize = 50 
+        self.create_thumb(thumb_text,self.thumb_size)
         self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
         self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #Print Management and Log
@@ -339,6 +340,7 @@ class PhotoBooth:
         os.system(line)  # -o media=Custom.7.4x21.0cm
         self.save_print_count(self.print_count+1)
     def create_thumb(self,text,size,anchor="mm",align="center"):
+        self.thumb_text = text
         font =  self.thumb_font
         fontsize = self.thumb_fontsize
         self.thumb_img= Image.new(mode="RGBA",size=size,color="white")
