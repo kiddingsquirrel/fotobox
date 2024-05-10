@@ -1,60 +1,153 @@
 import sys
-import picamera as pcam
 from PIL import Image, ImageOps,ImageFont, ImageColor, ImageDraw
 import time
 import pygame
-import RPi.GPIO as GPIO
 import os
 import shutil
+from nc_py_api import Nextcloud
+import qrcode
+from pathlib import Path
+import picamera as pcam
+import RPi.GPIO as GPIO
 
-
-class PhotoBooth:
-    def __init__(self):
-        # Define some Constants: ------------------------------------
-        # Style 2 is default
-        # Image Capturing
-        self.resolution = (2340,1523) # px(width,height)  capturing
-        self.pic_size = (860,560)   # px(width,height) on montage
-        # Printing 
-        self.printer ="D80_4x6x2" #Name of the printer
-        self.slip_format = (1800,1200) # px of the paper 
-        self.paper_format = (1800, 2400) # px of paper which will be cut
-        self.print_rows= 2   # number of rows of montage on print
-        self.print_colums= 1 # number of colums of montage on print
-        # Montage
-        self.total_pics = 4 # number of pictures taken
-        self.grid_rows = 2  # number of rows on montage
-        self.grid_colums= 2 # number of columns on montage
-        self.x_offset= 25
-        self.x_space = 25      
-        self.y_space = 25
-        self.y_offset= 25
-        self.thumb = False  # Is there a thumbnail
-        self.thumb_4x1_path= "/home/fotobox/Desktop/Thumbnails/4x1_Montage/thumb.png"
-        self.thumb_4x1_size= (600, 135) 
-        self.thumb_2x2_path= "/home/fotobox/Desktop/Thumbnails/2x2_Montage/thumb.png"
-        self.thumb_2x2_size= (1740, 135) 
-
-        self.thumb_size = self.thumb_4x1_size
-        self.thumb_path = self.thumb_4x1_path
+class NextCloudClient:
+    def __init__(self,base_path,nc_folder, url, user, password):
+        self.basepath = base_path
+        self.url= url
+        self.user = user
+        self.password = password
+        self.nc_folder=self.create_folder(nc_folder)
+        self.current_link = None
+        self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
+        self.last_upload_succesfull = False
+    def get_nc_folder(self):
+        return self.nc_folder
+    def connect_client(self):
+        try:
+            self.client = Nextcloud(nextcloud_url = self.url,nc_auth_user=self.user, nc_auth_pass=self.password)
+            api_response= None
+            try:
+                api_response = self.client.files.sharing.available
+                if api_response:
+                    self.nc_available = True
+                    print("NC connected")
+                else:
+                    self.nc_available = False
+            except Exception as e:
+                print("NC not connected - see detailed information")
+                print(e)
+                self.nc_available= False
+        except Exception as e:
+            print(e)
+            self.nc_available = False
+    def create_folder(self,folder_name):
+        try:
+            # Connect to the Nect-Cloud Clinet 
+            self.connect_client()
+            if self.nc_available:
+                # check if the folder already exist
+                if self.check_folder_exist(folder_name):
+                    print("Folder already exist")
+                    return folder_name
+                else:
+                    # Create folder
+                    try:
+                        self.client.files.mkdir(str(folder_name))
+                        self.nc_folder=folder_name
+                        print(f"Created folder: {folder_name} at NC-Instance")
+                    except Exception as e:
+                        print(f"Error creating folder:{folder_name}")
+                        print(e)
+                        return None
+            else:
+                print("Next-Cloud is not available")
+                return None
+        except Exception as e:
+            print(e)
+            return None
+    def check_folder_exist(self, folder_name):
+        try:
+            all_files_folders = self.client.files.listdir(depth=1)
+            user_paths = []
+            for obj in all_files_folders:
+                user_paths.append(obj.user_path)
+            if f"{folder_name}/" in user_paths:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(e)
+            return False
+    def print_structure(self):
+        all_files_folders = self.client.files.listdir(depth=-1)
+        for obj in all_files_folders:
+            print(obj.user_path)
+    def upload_file(self,local_path, file_name):
+        destination_path = f"{self.nc_folder}/{file_name}"
+        print(destination_path)
+        try:
+            with open(local_path,"rb") as file:
+                file_data = file.read() # Ensure that fill is read correctly 
+                response=self.client.files.upload(destination_path, file_data)
+                print(response)
+                link = self.client.files.sharing.create(destination_path,3).url
+                print(link)
+                self.last_upload_succesfull=True
+                return(link)
+        except Exception as e:
+            self.last_upload_succesfull=False
+            print(f"There was a problem uploading and creating the link: {e}")
+            return None
         
-        self.thumb_fonts = {'Oswald':'Oswald/Oswald-VariableFont_wght.ttf',
-                            'Bentham':'Bentham/Bentham-Regular.ttf',
-                            'Flaemisch':'flaemische-kanzleischrift/Flaemische Kanzleischrift.ttf',
-                            'Lora':'Lora/Lora-VariableFont_wght.ttf',
-                            'Linux':'linux_biolinum/LinBiolinum_R.ttf',
-                            'Great':'Great_Vibes/GreatVibes-Regular.ttf'}
-        self.thumb_font = "/home/fotobox/github/fotobox/Fonts/Oswald/Oswald-VariableFont_wght.ttf"
+    def create_qr(self, link, timestamp):
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4)
+            qr.add_data(link)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            self.current_qr_path = os.path.join(self.basepath,"temps","QR.png")
+            img.save(self.current_qr_path)
+            print(f"Created qr-Code for {link}")
+        except:
+            print(f"Error creating QR-Code for {link}")
+        print("Created QR")
+    def get_status_last_update(self):
+        return self.last_upload_succesfull
+                             
+class PhotoBooth:
+    
+    def __init__(self,base_path, montage_style, thumb_inbox, thumb_text):
+        self.base_path = base_path
+        self.thumb_2x2_size= (1740, 135)
+        self.thumb_4x1_size= (600, 260) 
+        self.set_thumb_path(thumb_inbox)
+        self.montage_style = montage_style
+        self.thumb_fonts = {'Oswald': os.path.join('Oswald','Oswald-VariableFont_wght.ttf'),
+                            'Bentham':os.path.join('Bentham','Bentham-Regular.ttf'),
+                            'Flaemisch':os.path.join('flaemische-kanzleischrift','Flaemische Kanzleischrift.ttf'),
+                            'Lora':os.path.join('Lora','Lora-VariableFont_wght.ttf'),
+                            'Linux':os.path.join('linux_biolinum','LinBiolinum_R.ttf'),
+                            'Great':os.path.join('Great_Vibes','GreatVibes-Regular.ttf')}
+        self.thumb_font = os.path.join(self.base_path,'Fonts',self.thumb_fonts["Oswald"])
         self.thumb_fontsize = 50 
-        self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
-        self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
+        self.set_montage_style(montage_style)
+        if self.thumb_inbox:
+            self.create_thumb(thumb_text,self.thumb_size)
+            self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
+            self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #Print Management and Log
-        self.print_log_path = "/home/fotobox/github/fotobox/print_log.txt"
+        self.print_log_path = os.path.join(self.base_path,"print_log.txt")
         self.print_count = self.load_print_count() 
         self.print_max_count = 215
         #File Management
-        self.save_path = "/media/fotobox/INTENSO/" #/home/pi/Desktop/Pics/
-        self.back_up_path = "/home/fotobox/Back_up_Booth_Pics"  
+        self.path_desktop = os.path.join(self.base_path,"Dummy_Desktop/")
+        self.path_media = os.path.join(self.base_path,"Dummy_Media")
+        self.save_path = self.path_media
+        self.back_up_path = os.path.join(self.base_path,"Dummy_Backup/")  
         try:
             os.mkdir(self.save_path)
         except OSError:
@@ -62,26 +155,19 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)  
-    def load_print_count(self):
-        try:
-            with open(self.print_log_path,"r") as file:
-                count= int(file.read())
-                print(f"The current print cout is {str(count)}")
-                return count
-        except FileNotFoundError as e:
-            print(f"Error: {e}")
-            # Creat File if it doesn't exist and return 0
-            self.save_print_count(str(0))
-            return int(0)
-    def save_print_count(self,count):
-        with open(self.print_log_path,"w") as file:
-            file.write(int(count))        
-    def get_thumb_status(self):
-        return self.thumb
-    def get_thumb_size(self):
-        return self.thumb_size
-    def style_set(self,style):
-        if style == 1: #4Bilder + Thumbnail - 4x6*2 Paper Slipe
+    def set_thumb_path(self, thumb_inbox):
+        if thumb_inbox:
+            self.thumb_source = "InBox"
+            print(self.thumb_source)
+        else:
+            self.thumb_source = "InkScape"
+            print(self.thumb_source)
+        self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'4x1_Montage','thumb.png')
+        self.thumb_2x2_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'2x2_Montage','thumb.png')
+        self.thumb_inbox = thumb_inbox
+    def set_montage_style(self,montage_style):
+        self.montage_style= montage_style
+        if self.montage_style == 1: 
             # Image Capturing
             self.resolution = (2340,1316) # px(width,height)  capturing
             self.pic_size = (860,480)   # px(width,height) on montage
@@ -102,7 +188,7 @@ class PhotoBooth:
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = self.thumb_2x2_size # px of thumbnail image
             self.thumb_path = self.thumb_2x2_path# path to the thumbnail
-        if style == 2: #4Bilder
+        if self.montage_style == 2:
             # Image Capturing
             self.resolution = (2340,1523) # px(width,height)  capturing
             self.pic_size = (860,560)   # px(width,height) on montage
@@ -119,7 +205,9 @@ class PhotoBooth:
             self.y_space = 25
             self.y_offset= 25
             self.thumb = False  # Is there a thumbnail
-        if style == 3: # 4 Bilder + Thumbnail - 2x6*2 Paper Slipe
+            self.thumb_size = self.thumb_2x2_size # px of thumbnail image
+            self.thumb_path = self.thumb_2x2_path# path to the thumbnail
+        if self.montage_style == 3:
             # Image Capturing
             self.resolution = (2340,1523) #self._current_window.buttons[font_key].update_image("Images/style/Font_"+str(font_key)+"_active.png") px(width,height)  capturing
             self.pic_size = (530,350)   # px(width,height) on montage
@@ -140,7 +228,25 @@ class PhotoBooth:
             self.thumb = True  # Is there a thumbnail
             self.thumb_size = self.thumb_4x1_size# px of thumbnail image
             self.thumb_path = self.thumb_4x1_path # path to the thumbnail
-
+    def load_print_count(self):
+        try:
+            with open(self.print_log_path,"r") as file:
+                count= int(file.read())
+                print(f"The current print cout is {str(count)}")
+                return count
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
+            # Creat File if it doesn't exist and return 0
+            self.save_print_count(str(0))
+            return int(0)
+    def save_print_count(self,count):
+        with open(self.print_log_path,"w") as file:
+            file.write(str(count))        
+    def get_thumb_status(self):
+        return self.thumb
+    def get_thumb_size(self):
+        return self.thumb_size
+    
     def show_image(self, image_path):
         pygame.init()
         pygame.display.set_caption('Photo Booth Pics')
@@ -294,6 +400,7 @@ class PhotoBooth:
         os.system(line)  # -o media=Custom.7.4x21.0cm
         self.save_print_count(self.print_count+1)
     def create_thumb(self,text,size,anchor="mm",align="center"):
+        self.thumb_text = text
         font =  self.thumb_font
         fontsize = self.thumb_fontsize
         self.thumb_img= Image.new(mode="RGBA",size=size,color="white")
