@@ -79,22 +79,7 @@ class NextCloudClient:
         all_files_folders = self.client.files.listdir(depth=-1)
         for obj in all_files_folders:
             print(obj.user_path)
-    def upload_file(self,local_path, destination_path):
-        print(destination_path)
-        try:
-            with open(local_path,"rb") as file:
-                file_data = file.read() # Ensure that fill is read correctly 
-                response=self.client.files.upload(destination_path, file_data)
-                print(response)
-                link = self.client.files.sharing.create(destination_path,3).url
-                self.last_upload_succesfull=True
-                print(link)
-                return(link)
-        except Exception as e:
-            self.last_upload_succesfull=False
-            print(f"There was a problem uploading and creating the link: {e}")
-            return None
-    def upload_file2(self,local_path, file_name):
+    def upload_file(self,local_path, file_name):
         destination_path = f"{self.nc_folder}/{file_name}"
         print(destination_path)
         try:
@@ -127,16 +112,17 @@ class NextCloudClient:
         except:
             print(f"Error creating QR-Code for {link}")
         print("Created QR")
+    def get_status_last_update(self):
+        return self.last_upload_succesfull
                              
 class PhotoBooth:
     
-    def __init__(self,base_path, montage_style, thumb_text):
+    def __init__(self,base_path, montage_style, thumb_inbox, thumb_text):
         self.base_path = base_path
-        self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails','4x1_Montage','thumb.png')
-        self.thumb_4x1_size= (600, 135) 
-        self.thumb_2x2_path= os.path.join(self.base_path,'Thumbnails','2x2_Montage','thumb.png')
-        self.thumb_2x2_size= (1740, 135) 
-        self.set_montage_style(montage_style) 
+        self.thumb_2x2_size= (1740, 135)
+        self.thumb_4x1_size= (600, 260) 
+        self.set_thumb_path(thumb_inbox)
+        self.montage_style = montage_style
         self.thumb_fonts = {'Oswald': os.path.join('Oswald','Oswald-VariableFont_wght.ttf'),
                             'Bentham':os.path.join('Bentham','Bentham-Regular.ttf'),
                             'Flaemisch':os.path.join('flaemische-kanzleischrift','Flaemische Kanzleischrift.ttf'),
@@ -145,9 +131,11 @@ class PhotoBooth:
                             'Great':os.path.join('Great_Vibes','GreatVibes-Regular.ttf')}
         self.thumb_font = os.path.join(self.base_path,'Fonts',self.thumb_fonts["Oswald"])
         self.thumb_fontsize = 50 
-        self.create_thumb(thumb_text,self.thumb_size)
-        self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
-        self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
+        self.set_montage_style(montage_style)
+        if self.thumb_inbox:
+            self.create_thumb(thumb_text,self.thumb_size)
+            self.thumb_img = Image.open(self.thumb_path) # Open Image for the thumbnail
+            self.thumb_img.resize((self.thumb_size[0], self.thumb_size[1])) # Image for the thumbnail 
         #Print Management and Log
         self.print_log_path = os.path.join(self.base_path,"print_log.txt")
         self.print_count = self.load_print_count() 
@@ -164,6 +152,16 @@ class PhotoBooth:
         # -----------------------------------------------------------
         pygame.init()
         self.size = (pygame.display.Info().current_w, pygame.display.Info().current_h)  
+    def set_thumb_path(self, thumb_inbox):
+        if thumb_inbox:
+            self.thumb_source = "InBox"
+            print(self.thumb_source)
+        else:
+            self.thumb_source = "InkScape"
+            print(self.thumb_source)
+        self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'4x1_Montage','thumb.png')
+        self.thumb_2x2_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'2x2_Montage','thumb.png')
+        self.thumb_inbox = thumb_inbox
     def set_montage_style(self,montage_style):
         self.montage_style= montage_style
         if self.montage_style == 1: 

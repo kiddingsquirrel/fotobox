@@ -43,6 +43,7 @@ class App(cevent.CEvent):
         
         self.settings = {"printing":False, "Upload":True, "usb":True,
                          "FULLSCREEN": False,
+                         "Thumb_InBox": False, 
                          "montage_thumb_text" : "Dev Days 2024",
                          "montage_style": 2,
                          "NC-folder":"Dev-Days-2024", 
@@ -50,7 +51,7 @@ class App(cevent.CEvent):
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
         self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
-        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"], self.settings["montage_thumb_text"])
+        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"])
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -260,7 +261,7 @@ class App(cevent.CEvent):
                                                          lambda: self.set_style_montage(2)), 
                                                          "style_2")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/style_3.png",
-                                                         (900, 205),  # (x, y) position
+                                                         (910, 205),  # (x, y) position
                                                          lambda: self.set_style_montage(3)), 
                                                          "style_3")
         ## Add Elements for user to adjust the thumbnail
@@ -270,65 +271,71 @@ class App(cevent.CEvent):
                                                         (220,38)),
                                                         "Thumbnaildesign")
         self._thumb_images.append("Thumbnaildesign")
-        self._set_montage_window.add_image(pgimage.Image(self.booth.thumb_path,(205,660),(870,68)),"thumbnail")
+        self._set_montage_window.add_image(pgimage.Image(self.booth.thumb_path,(205,750),(870,68)),"thumbnail")
         self._thumb_images.append("thumbnail")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Thumb_InBox.png",(90,675),lambda: self.set_thumb_source("InBox")),"InBox")
+        self._thumb_buttons = []
+        self._thumb_buttons.append("InBox")
+        self._set_montage_window.add_button(pgbutton.Button("Images/style/Thumb_InkScape.png",(800,675),lambda: self.set_thumb_source("InkScape")),"InkScape")
+        self._thumb_buttons.append("InkScape")
+        ## Add Elements for Font Management 
+        self._font_images = []
         self._set_montage_window.add_image(pgimage.Image("Images/style/Zeile1.png",
                                                     (90,840),
                                                     (95,35)),
                                                     "Text Zeile 1")
-        self._thumb_images.append("Text Zeile 1")
+        self._font_images.append("Text Zeile 1")
         self._set_montage_window.add_image(pgimage.Image("Images/style/Zeile2.png",
                                                     (90,910),
                                                     (95,35)),
                                                     "Text Zeile 2")
-        self._thumb_images.append("Text Zeile 2")
-        self._thumb_input_boxes = []
+        self._font_images.append("Text Zeile 2")
+        self._font_input_boxes = []
         self._set_montage_window.add_inputbox(pginputbox.InputBox((205,840),(380,50),"",self.create_thumb_from_input),'Zeile 1')
-        self._thumb_input_boxes.append('Zeile 1')
+        self._font_input_boxes.append('Zeile 1')
         self._set_montage_window.add_inputbox(pginputbox.InputBox((205,910),(380,50),"",self.create_thumb_from_input),'Zeile 2')
-        self._thumb_input_boxes.append("Zeile 2")
-        self._thumb_buttons = []
-        ## Add Elements for Font Management 
+        self._font_input_boxes.append("Zeile 2")  
+        self._font_buttons = []
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Up.png",
                                                        (650, 840),  # (x, y) position
                                                        self.set_font_up), 
                                                        "Font Up")
-        self._thumb_buttons.append("Font Up")
+        self._font_buttons.append("Font Up")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Down.png",
                                                          (650, 910),  # (x, y) position
                                                          self.set_font_down), 
                                                          "Font Down")
-        self._thumb_buttons.append("Font Down")
+        self._font_buttons.append("Font Down")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Oswald_active.png",
                                                          (740, 840),  # (x, y) position
                                                          lambda: self.set_font("Oswald")), 
                                                          "Oswald")
-        self._thumb_buttons.append("Oswald")
+        self._font_buttons.append("Oswald")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Bentham.png",
                                                          (920, 840),  # (x, y) position
                                                          lambda: self.set_font("Bentham")), 
                                                          "Bentham")
-        self._thumb_buttons.append("Bentham")
+        self._font_buttons.append("Bentham")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Flaemisch.png",
                                                          (1100, 840),  # (x, y) position
                                                          lambda: self.set_font("Flaemisch")), 
                                                          "Flaemisch")
-        self._thumb_buttons.append("Flaemisch")
+        self._font_buttons.append("Flaemisch")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Lora.png",
                                                          (740, 910),  # (x, y) position
                                                          lambda: self.set_font("Lora")), 
                                                          "Lora")
-        self._thumb_buttons.append("Lora")
+        self._font_buttons.append("Lora")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Linux.png",
                                                          (920, 910),  # (x, y) position
                                                          lambda: self.set_font("Linux")), 
                                                          "Linux")
-        self._thumb_buttons.append("Linux")
+        self._font_buttons.append("Linux")
         self._set_montage_window.add_button(pgbutton.Button("Images/style/Font_Great.png",
                                                          (1100, 910),  # (x, y) position
                                                          lambda: self.set_font("Great")), 
                                                          "Great")
-        self._thumb_buttons.append("Great")
+        self._font_buttons.append("Great")
    
     #def on_event(self, event):
     #     if event.type == pygame.QUIT:
@@ -379,27 +386,43 @@ class App(cevent.CEvent):
     def open_tutorial_printer_window(self):
         pass # tbd.
     def open_set_montage_window(self):
+        # Thumb
         for button in self._thumb_buttons:
             self._set_montage_window.buttons[button].visibility=False
         for image in self._thumb_images:
             self._set_montage_window.images[image].visibility = False
-        for inputbox in self._thumb_input_boxes:
+        # Font
+        for image in self._font_images:
+            self._set_montage_window.images[image].visibility = False
+        for button in self._font_buttons:
+            self._set_montage_window.buttons[button].visibility=False
+        for inputbox in self._font_input_boxes:
             self._set_montage_window.inputboxes[inputbox].visibility = False
         if self.booth.thumb:
-            
+            if self.booth.thumb_inbox:
+                self._set_montage_window.buttons["InBox"].update_image(f"Images/style/Thumb_{"InBox"}_a.png")
+                self._set_montage_window.buttons["InkScape"].update_image(f"Images/style/Thumb_{"InkScape"}.png")
+            else:
+                self._set_montage_window.buttons["InBox"].update_image(f"Images/style/Thumb_{"InBox"}.png")
+                self._set_montage_window.buttons["InkScape"].update_image(f"Images/style/Thumb_{"InkScape"}_a.png")
             if self.booth.montage_style==1:
-                self._set_montage_window.images["thumbnail"].location= (205,660)
+                self._set_montage_window.images["thumbnail"].location= (205,750)
                 self._set_montage_window.images["thumbnail"].size=(870,68)
             if self.booth.montage_style==3:
-                self._set_montage_window.images["thumbnail"].location= (500,660)
-                self._set_montage_window.images["thumbnail"].size=(305,68)
-            self._set_montage_window.images["thumbnail"].update(self.booth.thumb_path)
+                self._set_montage_window.images["thumbnail"].location= (500,675)
+                self._set_montage_window.images["thumbnail"].size=(280 ,130)
             for button in self._thumb_buttons:
-                self._set_montage_window.buttons[button].visibility=True
+                self._set_montage_window.buttons[button].visibility = True
             for image in self._thumb_images:
                 self._set_montage_window.images[image].visibility = True
-            for inputbox in self._thumb_input_boxes:
-                self._set_montage_window.inputboxes[inputbox].visibility = True 
+            self._set_montage_window.images["thumbnail"].update(self.booth.thumb_path)
+            if self.booth.thumb_inbox==True:
+                for button in self._font_buttons:
+                    self._set_montage_window.buttons[button].visibility=True
+                for image in self._font_images:
+                    self._set_montage_window.images[image].visibility = True
+                for inputbox in self._font_input_boxes:
+                    self._set_montage_window.inputboxes[inputbox].visibility = True 
         self._current_window= self._set_montage_window
         self.on_render()
     def set_style_montage(self,style):
@@ -409,6 +432,15 @@ class App(cevent.CEvent):
             self._set_montage_window.buttons[f"style_{c_style}"].update_image(f"Images/style/style_{str(c_style)}.png")
         self.booth.set_montage_style(style)
         self.open_set_montage_window()
+    def set_thumb_source(self,variable):
+        if variable == "InBox":
+            self.booth.set_thumb_path(True)
+        elif variable =="InkScape":
+            self.booth.set_thumb_path(False)
+        self.booth.set_montage_style(self.booth.montage_style)
+        print(self.booth.thumb_path)
+        self.open_set_montage_window() 
+            
     def open_QR_window(self):
         # tbd.
         pass
@@ -514,8 +546,7 @@ class App(cevent.CEvent):
                     self.on_loop()
                     self.on_render()
             self.on_cleanup()
-    def set_print(self):
-        self._current_window = self._after_capture_print_window
+
 
     def set_capture(self):
         self._current_window = self._capture_window
@@ -525,8 +556,145 @@ class App(cevent.CEvent):
         self.on_render()
         self.last_pic_path = self.booth.make_collage()
         timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
+        for button in self._after_capture_window.buttons:
+            self._after_capture_window.buttons[button].visibility= False
+        for image in self._after_capture_window.images:
+            self._after_capture_window.images[image].visibility= False
+        if self.booth.montage_style == 1 or self.booth.montage_style==2:
+            # Postcard Format
+            self._after_capture_window.images["Montage"].size = (1000,667)
+            self._after_capture_window.images["Montage"].location = [140,55]
+            self._after_capture_window.images["Montage"].update(self.last_pic_path)
+            self._after_capture_window.images["Montage"].visibility=True
+            if self.settings["Upload"]==True:
+                link = self.NextCloudClient.upload_file(self.last_pic_path,f"{timestamp}.jpg")
+                self.NextCloudClient.create_qr(link,timestamp)
+                print(self.NextCloudClient.get_status_last_update())
+                if self.NextCloudClient.get_status_last_update()==True:
+                    self._after_capture_window.images["QR-Code"].location=[890,745]
+                    self._after_capture_window.images["QR-Code"].update(self.NextCloudClient.current_qr_path)
+                    self._after_capture_window.images["QR-Code"].visibility=True
+                    if self.settings["printing"]==True:
+                        self._after_capture_window.images["Erklärung"].size=(650,88)
+                        self._after_capture_window.images["Erklärung"].location=[140,760]
+                        self._after_capture_window.images["Erklärung"].update("Images/After_Capture/Print_Qr_explain.png")
+                        self._after_capture_window.images["Erklärung"].visibility= True
+                        self._after_capture_window.buttons["drucken"].size= (350, 120)
+                        self._after_capture_window.buttons["drucken"].location = [515,875]
+                        self._after_capture_window.buttons["drucken"].update_image("Images/After_Capture/Print_Qr_b1.png")
+                        self._after_capture_window.buttons["drucken"].visibility=True
+                        self._after_capture_window.buttons["weiter"].size= (350, 120)
+                        self._after_capture_window.buttons["weiter"].location = [140,875]
+                        self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Print_Qr_bWeiter.png")
+                        self._after_capture_window.buttons["weiter"].visibility=True
+                    if self.settings["printing"]==False:
+                        self._after_capture_window.images["Erklärung"].size=(645,100)
+                        self._after_capture_window.images["Erklärung"].location=[140,755]
+                        self._after_capture_window.images["Erklärung"].update("Images/After_Capture/Qr_explain.png")
+                        self._after_capture_window.images["Erklärung"].visibility= True
+                        self._after_capture_window.buttons["weiter"].size= (730, 120)
+                        self._after_capture_window.buttons["weiter"].location = [140,875]
+                        self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
+                        self._after_capture_window.buttons["weiter"].visibility=True
+            if self.settings["Upload"]==False or self.NextCloudClient.get_status_last_update()== False:
+                if self.settings["printing"]==True:
+                    self._after_capture_window.buttons["drucken"].size= (470, 150)
+                    self._after_capture_window.buttons["drucken"].location = [667,785]
+                    self._after_capture_window.buttons["drucken"].update_image("Images/After_Capture/Print_b1.png")
+                    self._after_capture_window.buttons["drucken"].visibility=True
+                    self._after_capture_window.buttons["weiter"].size= (470, 150)
+                    self._after_capture_window.buttons["weiter"].location = [140,785]
+                    self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Print_bWeiter.png")
+                    self._after_capture_window.buttons["weiter"].visibility=True
+                if self.settings["printing"]==False:
+                    self._after_capture_window.buttons["weiter"].size= (730, 120)
+                    self._after_capture_window.buttons["weiter"].location = [275,875]
+                    self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
+                    self._after_capture_window.buttons["weiter"].visibility=True
+            
+                
+        if self.booth.montage_style == 3:
+            # Stripe Format
+            self._after_capture_window.images["Montage"].size = (300,900)
+            self._after_capture_window.images["Montage"].location = [150,60]
+            self._after_capture_window.images["Montage"].update(self.last_pic_path)
+            self._after_capture_window.images["Montage"].visibility=True
+            if self.settings["Upload"]==True:
+                link = self.NextCloudClient.upload_file(self.last_pic_path,f"{timestamp}.jpg")
+                self.NextCloudClient.create_qr(link,timestamp)
+                print(self.NextCloudClient.get_status_last_update())
+                if self.NextCloudClient.get_status_last_update()==True:
+                    self._after_capture_window.images["QR-Code"].update(self.NextCloudClient.current_qr_path)
+                    self._after_capture_window.images["QR-Code"].visibility=True
+                    if self.settings["printing"]==True:
+                        self._after_capture_window.images["QR-Code"].location=[950,390]
+                        self._after_capture_window.images["Erklärung"].size=(650,88)
+                        self._after_capture_window.images["Erklärung"].location=[545,265]
+                        self._after_capture_window.images["Erklärung"].update("Images/After_Capture/Print_Qr_explain.png")
+                        self._after_capture_window.images["Erklärung"].visibility= True
+                        self._after_capture_window.buttons["drucken"].size= (350, 120)
+                        self._after_capture_window.buttons["drucken"].location = [545,530]
+                        self._after_capture_window.buttons["drucken"].update_image("Images/After_Capture/Print_Qr_b1.png")
+                        self._after_capture_window.buttons["drucken"].visibility=True
+                        self._after_capture_window.buttons["weiter"].size= (350, 120)
+                        self._after_capture_window.buttons["weiter"].location = [545,390]
+                        self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Print_Qr_bWeiter.png")
+                        self._after_capture_window.buttons["weiter"].visibility=True   
+                    if self.settings["printing"]==False:
+                        self._after_capture_window.images["QR-Code"].location=[745,415]
+                        self._after_capture_window.images["Erklärung"].size=(645,100)
+                        self._after_capture_window.images["Erklärung"].location=[545,265]
+                        self._after_capture_window.images["Erklärung"].update("Images/After_Capture/Qr_explain.png")
+                        self._after_capture_window.images["Erklärung"].visibility= True
+                        self._after_capture_window.buttons["weiter"].size= (730, 120)
+                        self._after_capture_window.buttons["weiter"].location = [500,720]
+                        self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
+                        self._after_capture_window.buttons["weiter"].visibility=True
+            if self.settings["Upload"]==False or self.NextCloudClient.get_status_last_update()== False:
+                if self.settings["printing"]==True:
+                    self._after_capture_window.buttons["drucken"].size= (470, 150)
+                    self._after_capture_window.buttons["drucken"].location = [630,570]
+                    self._after_capture_window.buttons["drucken"].update_image("Images/After_Capture/Print_b1.png")
+                    self._after_capture_window.buttons["drucken"].visibility=True
+                    self._after_capture_window.buttons["weiter"].size= (470, 150)
+                    self._after_capture_window.buttons["weiter"].location = [630,300]
+                    self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Print_bWeiter.png")
+                    self._after_capture_window.buttons["weiter"].visibility=True
+                if self.settings["printing"]==False:
+                    self._after_capture_window.buttons["weiter"].size= (730, 120)
+                    self._after_capture_window.buttons["weiter"].location = [505,450]
+                    self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
+                    self._after_capture_window.buttons["weiter"].visibility=True    
+            pass
+        
+        # Next Step handle false Upload :(
+        
+        self._current_window = self._after_capture_window
+        
+        """
+        self._after_capture_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
+        self._after_capture_window.add_image(pgimage.Image("Images/After_Capture/Qr_explain.png",
+                                                (140,755),
+                                                (645,100),visibility=False),
+                                                "Erklärung")
+        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Print_b1.png",
+                                                      (667,785), self.printone,visibility=False),
+                                                      "drucken")
+        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
+                                                      (275,785),
+                                                      self.set_start,visibility=False),
+                                                      "weiter")
+        self._after_capture_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
+                                                                    (890,745),
+                                                                    (250,250),visibility=False),
+                                                                    "QR-Code")
+        
+        
+        """
+        
+        
+        """
         if self.settings["Upload"]==True:
-            #link = self.NextCloudClient.upload_file(self.last_pic_path,f"Test/{timestamp}.jpg")
             link = self.NextCloudClient.upload_file2(self.last_pic_path,f"{timestamp}.jpg")
             if self.NextCloudClient.last_upload_succesfull:
                 self.NextCloudClient.create_qr(link,timestamp)
@@ -553,6 +721,7 @@ class App(cevent.CEvent):
             else:
                 self._after_capture_window.images["Montage"].update(self.last_pic_path)
                 self._current_window = self._after_capture_window
+        """
     def set_start(self):
         self._current_window = self._start_window
     
