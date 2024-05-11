@@ -16,10 +16,14 @@ class NextCloudClient:
         self.url= url
         self.user = user
         self.password = password
+        self.connect_client()
         self.nc_folder=self.create_folder(nc_folder)
         self.current_link = None
         self.current_qr_path = os.path.join(base_path,"temps/","QR.png")
         self.last_upload_succesfull = False
+    def set_nc_folder(self,folder):
+        self.nc_folder = folder
+
     def get_nc_folder(self):
         return self.nc_folder
     def connect_client(self):

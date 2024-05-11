@@ -15,12 +15,12 @@ import pgimage
 pygame.init() # Necessary to use font libary in class pginputbox
 import pginputbox # pygame.init() has to be before import pginputbox !!!!
 import pgtext
-import PhotoBooth_Dev_Wind
+import PhotoBooth
 import socket
 
 
 
-working_dictonary= r"C:\Users\Jonathan\NextCloud_hosted_by_Esra\Maker_Stuff\FotoBox\Local_GitRepo\fotobox" #Dictonary in which all files are located(images and other classes)
+working_dictonary= os.getcwd() #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
         self._running = True                                                # Status of the programm
@@ -43,15 +43,15 @@ class App(cevent.CEvent):
         
         self.settings = {"printing":False, "Upload":True, "usb":True,
                          "FULLSCREEN": False,
-                         "Thumb_InBox": False, 
+                         "Thumb_InBox": True, 
                          "montage_thumb_text" : "Dev Days 2024",
                          "montage_style": 2,
                          "NC-folder":"Dev-Days-2024", 
                          "nc-url":"https://nc-8872520695452827614.nextcloud-ionos.com/",
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
-        self.NextCloudClient = PhotoBooth_Dev_Wind.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
-        self.booth = PhotoBooth_Dev_Wind.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"])
+        self.NextCloudClient = PhotoBooth.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
+        self.booth = PhotoBooth.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"])
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -400,11 +400,11 @@ class App(cevent.CEvent):
             self._set_montage_window.inputboxes[inputbox].visibility = False
         if self.booth.thumb:
             if self.booth.thumb_inbox:
-                self._set_montage_window.buttons["InBox"].update_image(f"Images/style/Thumb_{"InBox"}_a.png")
-                self._set_montage_window.buttons["InkScape"].update_image(f"Images/style/Thumb_{"InkScape"}.png")
+                self._set_montage_window.buttons["InBox"].update_image("Images/style/Thumb_InBox_a.png")
+                self._set_montage_window.buttons["InkScape"].update_image("Images/style/Thumb_InkScape.png")
             else:
-                self._set_montage_window.buttons["InBox"].update_image(f"Images/style/Thumb_{"InBox"}.png")
-                self._set_montage_window.buttons["InkScape"].update_image(f"Images/style/Thumb_{"InkScape"}_a.png")
+                self._set_montage_window.buttons["InBox"].update_image("Images/style/Thumb_InBox.png")
+                self._set_montage_window.buttons["InkScape"].update_image("Images/style/Thumb_InkScape_a.png")
             if self.booth.montage_style==1:
                 self._set_montage_window.images["thumbnail"].location= (205,750)
                 self._set_montage_window.images["thumbnail"].size=(870,68)
@@ -776,11 +776,20 @@ class App(cevent.CEvent):
         self._current_window= self._settings_window
         self.on_render()
     def update_NC_folder(self):
-        window = self._current_window
-        c_folder_name = str(window.inputboxes["Input NC-Folder"].get_text())
+        self._current_window = self._settings_window 
+        c_folder_name = str(self._settings_window.inputboxes["Input NC-Folder"].get_text())
+        self._settings_window.texts["NC-Erreichbarkeit"].update_text(" ")
+        print("before ob render 1")
+        self.open_settings()
+        self._settings_window.texts["NC-Erreichbarkeit"].update_text("- Status des NC-Ordners {}:".format(self.NextCloudClient.get_nc_folder()))
+        self.NextCloudClient.set_nc_folder(c_folder_name)
+        print("before ob render 2")
+        self.open_settings()
         self.NextCloudClient.create_folder(c_folder_name)
-        print(f"Created: {c_folder_name}")
-        print(self.NextCloudClient.get_nc_folder())
+        self._settings_window.texts["NC-Erreichbarkeit"].update_text("- Status des NC-Ordners {}: {}".format(self.NextCloudClient.get_nc_folder(), 
+                                                                                            "Erreichbar " if self.NextCloudClient.check_folder_exist(self.NextCloudClient.nc_folder)
+                                                                                            else "Nicht erreichbar"
+                                                                                            ))
         self.open_settings()
     def create_thumb_from_input(self):
         window=self._set_montage_window
