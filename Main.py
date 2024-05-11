@@ -51,7 +51,7 @@ class App(cevent.CEvent):
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
         self.NextCloudClient = PhotoBooth.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
-        self.booth = PhotoBooth.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"])
+        self.booth = PhotoBooth.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"],True)
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -554,6 +554,7 @@ class App(cevent.CEvent):
         self.booth.capture()
         self._current_window = self._development_window
         self.on_render()
+        start_time = time.datetime.now()
         self.last_pic_path = self.booth.make_collage()
         timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
         for button in self._after_capture_window.buttons:
@@ -665,63 +666,7 @@ class App(cevent.CEvent):
                     self._after_capture_window.buttons["weiter"].location = [505,450]
                     self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
                     self._after_capture_window.buttons["weiter"].visibility=True    
-            pass
-        
-        # Next Step handle false Upload :(
-        
-        self._current_window = self._after_capture_window
-        
-        """
-        self._after_capture_window.add_image(pgimage.Image(self.last_montage_path,(140,55),(1000,667)),"Montage")
-        self._after_capture_window.add_image(pgimage.Image("Images/After_Capture/Qr_explain.png",
-                                                (140,755),
-                                                (645,100),visibility=False),
-                                                "Erklärung")
-        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Print_b1.png",
-                                                      (667,785), self.printone,visibility=False),
-                                                      "drucken")
-        self._after_capture_window.add_button(pgbutton.Button("Images/After_Capture/Qr_weiter.png",
-                                                      (275,785),
-                                                      self.set_start,visibility=False),
-                                                      "weiter")
-        self._after_capture_window.add_image(pgimage.Image(self.NextCloudClient.current_qr_path,
-                                                                    (890,745),
-                                                                    (250,250),visibility=False),
-                                                                    "QR-Code")
-        
-        
-        """
-        
-        
-        """
-        if self.settings["Upload"]==True:
-            link = self.NextCloudClient.upload_file2(self.last_pic_path,f"{timestamp}.jpg")
-            if self.NextCloudClient.last_upload_succesfull:
-                self.NextCloudClient.create_qr(link,timestamp)
-                if self.settings["printing"]==True:
 
-                    self._after_capture_print_QR_window.images["Montage"].update(self.last_pic_path)
-                    self._after_capture_print_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
-                    self._current_window = self._after_capture_print_QR_window
-                else:
-                    self._after_capture_QR_window.images["Montage"].update(self.last_pic_path)
-                    self._after_capture_QR_window.images["QR"].update(self.NextCloudClient.current_qr_path)
-                    self._current_window = self._after_capture_QR_window
-            else:
-                if self.settings["printing"]==True:
-                    self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
-                    self._current_window = self._after_capture_print_window
-                else:
-                    self._after_capture_window.images["Montage"].update(self.last_pic_path)
-                    self._current_window = self._after_capture_window
-        else:
-            if self.settings["printing"]==True:
-                self._after_capture_print_window.images["Montage"].update(self.last_pic_path)
-                self._current_window = self._after_capture_print_window
-            else:
-                self._after_capture_window.images["Montage"].update(self.last_pic_path)
-                self._current_window = self._after_capture_window
-        """
     def set_start(self):
         self._current_window = self._start_window
     

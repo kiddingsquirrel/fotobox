@@ -15,5 +15,6 @@ class Text:
         surface.blit(self.txt_surface,self.location)
     def update_text(self,text):
         self.text = text
+        self.txt_surface = self.font.render(self.text,True,self.fontcolor)
 
 
