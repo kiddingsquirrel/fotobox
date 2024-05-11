@@ -169,7 +169,7 @@ class PhotoBooth:
             self.thumb_source = "InBox"
             print(self.thumb_source)
         else:
-            self.thumb_source = "InkScape"
+            self.thumb_source = "Inkscape"
             print(self.thumb_source)
         self.thumb_4x1_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'4x1_Montage','thumb.png')
         self.thumb_2x2_path= os.path.join(self.base_path,'Thumbnails',self.thumb_source,'2x2_Montage','thumb.png')
