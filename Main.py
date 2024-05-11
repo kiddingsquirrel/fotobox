@@ -51,7 +51,11 @@ class App(cevent.CEvent):
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
         self.NextCloudClient = PhotoBooth.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
-        self.booth = PhotoBooth.PhotoBooth(working_dictonary,self.settings["montage_style"],self.settings["Thumb_InBox"], self.settings["montage_thumb_text"],True)
+        self.booth = PhotoBooth.PhotoBooth(working_dictonary,
+                                           self.settings["montage_style"],
+                                           self.settings["Thumb_InBox"], 
+                                           self.settings["montage_thumb_text"],
+                                           False)
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
