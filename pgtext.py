@@ -1,7 +1,8 @@
 import pygame
 
 class Text:
-    def __init__(self,text,location,fontsize=16,color="white",font= None):
+    def __init__(self,text,location,fontsize=16,color="white",font= None,visibility=True):
+        self.visibility=visibility
         self.text=text
         self.location = location
         self.font=font
@@ -12,5 +13,8 @@ class Text:
     def draw(self,surface):
         # Blit the text
         surface.blit(self.txt_surface,self.location)
+    def update_text(self,text):
+        self.text = text
+        self.txt_surface = self.font.render(self.text,True,self.fontcolor)
 
 

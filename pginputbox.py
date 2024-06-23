@@ -5,8 +5,10 @@ class InputBox:
     def __init__(self,location,size,text,event,
                  COLOR_INACTIVE=pygame.Color('lightskyblue3'),
                  COLOR_ACTIVE=pygame.Color('dodgerblue2'),
-                 FONT= pygame.font.Font(None,16)):
+                 FONT= pygame.font.Font(None,16),
+                 visibility=True):
         self.location=location
+        self.visibility=visibility
         self.size=size
         self.rect=pygame.Rect(location[0],location[1],size[0],size[1])
         self.COLOR_INACTIVE=COLOR_INACTIVE
@@ -19,6 +21,8 @@ class InputBox:
         self.event= event
     def get_text(self):
         return self.text
+    def update_text(self,text):
+        self.text = text
     def over_box(self, pos):
         if self.rect.collidepoint(pos):
             return True
