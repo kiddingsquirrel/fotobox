@@ -7,6 +7,8 @@ import shutil
 from nc_py_api import Nextcloud
 import qrcode
 from pathlib import Path
+import picamera as pcam
+import RPi.GPIO as GPIO
 
 
 class NextCloudClient:
@@ -123,13 +125,7 @@ class NextCloudClient:
                              
 class PhotoBooth:
     
-    def __init__(self,base_path, montage_style, thumb_inbox, thumb_text, Windows = False):
-        self.Windows = Windows
-        if Windows==False:
-            import picamera as pcam
-            import RPi.GPIO as GPIO
-        else:
-            pass
+    def __init__(self,base_path, montage_style, thumb_inbox, thumb_text):
         self.base_path = base_path
         self.thumb_2x2_size= (1740, 135)
         self.thumb_4x1_size= (600, 260) 
@@ -153,7 +149,7 @@ class PhotoBooth:
         self.print_count = self.load_print_count() 
         self.print_max_count = 215
         #File Management
-        self.path_desktop = os.path.join(self.base_path,"Dummy_Desktop/")
+        self.path_desktop = os.path.join("/home/fotobox/Desktop/","Pics/")
         self.path_media = os.path.join(self.base_path,"Dummy_Media")
         self.save_path = self.path_media
         self.back_up_path = os.path.join(self.base_path,"Dummy_Backup/")  
@@ -273,75 +269,72 @@ class PhotoBooth:
         os.system(line)
 
     def capture(self):
-        if self.Windows == False:
-            # Display Blank Image
+    
+        # Display Blank Image
             
-            # Setup Camera
-            camera = pcam.PiCamera()
-            camera.resolution = self.resolution
-            # camera.vflip = True
-            camera.hflip = True
-            camera.saturation = 0 #-100  # -100 B/W 0 Color*
-            camera.shutter_speed = 18000 # original 18000
-            camera.iso = 320
-            #camera.start_preview(fullscreen=False, window=(0,0,1208,854))
-            camera.start_preview()
-            # For Loop to take pictures
-            for i in range(self.total_pics):
-                # Overlay countdown above the Preview on the Screen
-                for a in range(4,0,-1):
-                    img = Image.open("Images/count/count"+str(a)+".png")
-                    pad = Image.new('RGB',
+        # Setup Camera
+        camera = pcam.PiCamera()
+        camera.resolution = self.resolution
+        # camera.vflip = True
+        camera.hflip = True
+        camera.saturation = 0 #-100  # -100 B/W 0 Color*
+        camera.shutter_speed = 18000 # original 18000
+        camera.iso = 320
+        #camera.start_preview(fullscreen=False, window=(0,0,1208,854))
+        camera.start_preview()
+        # For Loop to take pictures
+        for i in range(self.total_pics):
+            # Overlay countdown above the Preview on the Screen
+            for a in range(4,0,-1):
+                img = Image.open("Images/count/count"+str(a)+".png")
+                pad = Image.new('RGB',
                                     (((img.size[0]+31)//32)*32,
                                     ((img.size[1]+15)//16)*16))
-                    
-                    pad.paste(img)
-                    #pad = pad.transpose(method=Image.ROTATE_180)
-                    o = camera.add_overlay(pad.tobytes(), size=pad.size)
-                    o.alpha = 80
-                    o.layer = 3
-                    time.sleep(1.5)
-                    camera.remove_overlay(o)
-                # Capture Image
-                img = Image.open("Images/count/count0.png")
-                pad = Image.new('RGB',
-                            (((img.size[0]+31)//32)*32,
-                            ((img.size[1]+15)//16)*16))
                     
                 pad.paste(img)
                 #pad = pad.transpose(method=Image.ROTATE_180)
                 o = camera.add_overlay(pad.tobytes(), size=pad.size)
-                o.alpha = 95
+                o.alpha = 80
                 o.layer = 3
-                                
-                try:
-                    camera.capture("temps/image_"+str(i)+".jpg")
-                except IOError:
-                    os.mkdir("temps")
-                    camera.capture("temps/image_"+str(i)+".jpg")
+                time.sleep(1.5)
                 camera.remove_overlay(o)
+                # Capture Image
+            img = Image.open("Images/count/count0.png")
+            pad = Image.new('RGB',
+                            (((img.size[0]+31)//32)*32,
+                            ((img.size[1]+15)//16)*16))
+                    
+            pad.paste(img)
+            #pad = pad.transpose(method=Image.ROTATE_180)
+            o = camera.add_overlay(pad.tobytes(), size=pad.size)
+            o.alpha = 95
+            o.layer = 3
+                                
+            try:
+                camera.capture("temps/image_"+str(i)+".jpg")
+            except IOError:
+                os.mkdir("temps")
+                camera.capture("temps/image_"+str(i)+".jpg")
+            camera.remove_overlay(o)
                 # Possible to display Captured Image
                 #show_image("temps/image_"+str(i)+".jpg")
                 #sleep(capture_delay)
-            camera.close()
-        else:
-            pass
+        camera.close()
+        
         
     def cam_preview(self):
-        if self.Windows == False:
-            camera_p = pcam.PiCamera()
-            camera_p.resolution = self.resolution
-            # camera.vflip = True
-            camera_p.hflip = False
-            camera_p.saturation = 0 #-100  # -100 B/W 0 Color*
-            camera_p.shutter_speed = 20000
-            camera_p.iso = 240
-            #camera.start_preview(fullscreen=False, window=(0,0,1208,854))
-            camera_p.start_preview()
-            time.sleep(20)
-            camera_p.close()
-        else:
-            pass
+        camera_p = pcam.PiCamera()
+        camera_p.resolution = self.resolution
+        # camera.vflip = True
+        camera_p.hflip = False
+        camera_p.saturation = 0 #-100  # -100 B/W 0 Color*
+        camera_p.shutter_speed = 20000
+        camera_p.iso = 240
+        #camera.start_preview(fullscreen=False, window=(0,0,1208,854))
+        camera_p.start_preview()
+        time.sleep(20)
+        camera_p.close()
+    
     
     def make_collage(self):
         now = time.strftime("%Y-%m-%d-%H-%M-%S")
@@ -399,24 +392,22 @@ class PhotoBooth:
         # print pic
 
     def print_montage(self, dest_file):
-        if self.Windows == False:
-            img = Image.open(dest_file)
-            img_print = Image.new("RGB", self.paper_format, color=(255,255,255))
-            y_off=0
-            for row in range(0,self.print_rows,1):
-                colum=0
-                x_off=0
-                for colum in range(0,self.print_colums,1):
-                    img_print.paste(img,(int(x_off),int(y_off)))
-                    x_off += img.size[0]
-                y_off += img.size[1]
-            img_print.save("temps/print_tmp.png")
-            line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
-            print(line)
-            os.system(line)  # -o media=Custom.7.4x21.0cm
-            self.save_print_count(self.print_count+1)
-        else:
-            pass
+        img = Image.open(dest_file)
+        img_print = Image.new("RGB", self.paper_format, color=(255,255,255))
+        y_off=0
+        for row in range(0,self.print_rows,1):
+            colum=0
+            x_off=0
+            for colum in range(0,self.print_colums,1):
+                img_print.paste(img,(int(x_off),int(y_off)))
+                x_off += img.size[0]
+            y_off += img.size[1]
+        img_print.save("temps/print_tmp.png")
+        line= str("sudo lp -d ") + self.printer +str(" ") + str("temps/print_tmp.png")
+        print(line)
+        os.system(line)  # -o media=Custom.7.4x21.0cm
+        self.save_print_count(self.print_count+1)
+        
     def create_thumb(self,text,size,anchor="mm",align="center"):
         self.thumb_text = text
         font =  self.thumb_font

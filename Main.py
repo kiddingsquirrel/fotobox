@@ -41,12 +41,12 @@ class App(cevent.CEvent):
         # Initializing Start Situation 
         self._current_window = self._start_window
         
-        self.settings = {"printing":False, "Upload":True, "usb":True,
-                         "FULLSCREEN": False,
-                         "Thumb_InBox": True, 
-                         "montage_thumb_text" : "Dev Days 2024",
-                         "montage_style": 2,
-                         "NC-folder":"Dev-Days-2024", 
+        self.settings = {"printing":False, "Upload":True, "usb":False,
+                         "FULLSCREEN": True,
+                         "Thumb_InBox": False, 
+                         "montage_thumb_text" : "",
+                         "montage_style": 3,
+                         "NC-folder":"BeReal_2024", 
                          "nc-url":"https://nc-8872520695452827614.nextcloud-ionos.com/",
                          "nc_user":"boxjoni",
                          "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
@@ -54,8 +54,7 @@ class App(cevent.CEvent):
         self.booth = PhotoBooth.PhotoBooth(working_dictonary,
                                            self.settings["montage_style"],
                                            self.settings["Thumb_InBox"], 
-                                           self.settings["montage_thumb_text"],
-                                           False)
+                                           self.settings["montage_thumb_text"])
         self.last_montage_path = "temps/collage.jpg"
         self.last_QR_path ="temps/QR.jpg"
         
@@ -558,7 +557,6 @@ class App(cevent.CEvent):
         self.booth.capture()
         self._current_window = self._development_window
         self.on_render()
-        start_time = time.datetime.now()
         self.last_pic_path = self.booth.make_collage()
         timestamp = time.strftime("%Y-%m-%d-%H-%M-%S")
         for button in self._after_capture_window.buttons:
@@ -670,7 +668,8 @@ class App(cevent.CEvent):
                     self._after_capture_window.buttons["weiter"].location = [505,450]
                     self._after_capture_window.buttons["weiter"].update_image("Images/After_Capture/Qr_weiter.png")
                     self._after_capture_window.buttons["weiter"].visibility=True    
-
+        self._current_window = self._after_capture_window
+        self.on_render()
     def set_start(self):
         self._current_window = self._start_window
     
