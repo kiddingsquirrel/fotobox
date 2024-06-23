@@ -8,7 +8,12 @@ import pgimage
 import PhotoBooth
 import time
 import os
-
+import sys
+print("Python version:", sys.version)
+for p in sys.path:
+    print(p)
+print("Current working directory:", os.getcwd())
+print(os.environ)
 working_dictonary= "/home/fotobox/github/fotobox" #Dictonary in which all files are located(images and other classes)
 class App(cevent.CEvent):
     def __init__(self):
