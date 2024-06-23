@@ -18,9 +18,10 @@ import pgtext
 import PhotoBooth
 import socket
 
-
-
+print("Script location:", os.path.abspath(__file__))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 working_dictonary= os.getcwd() #Dictonary in which all files are located(images and other classes)
+print("Working dictonary:", working_dictonary)
 class App(cevent.CEvent):
     def __init__(self):
         self._running = True                                                # Status of the programm
