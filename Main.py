@@ -48,9 +48,9 @@ class App(cevent.CEvent):
                          "montage_thumb_text" : "",
                          "montage_style": 3,
                          "NC-folder":"BeReal_2024", 
-                         "nc-url":"https://nc-8872520695452827614.nextcloud-ionos.com/",
-                         "nc_user":"boxjoni",
-                         "nc_pw":"FUUhJw0NTnXw"}  # all settings should reside in this dict
+                         "nc-url":"your URL",
+                         "nc_user":"your usr name",
+                         "nc_pw":"your password"}  # all settings should reside in this dict
         self.NextCloudClient = PhotoBooth.NextCloudClient(working_dictonary,self.settings["NC-folder"],self.settings["nc-url"],self.settings["nc_user"],self.settings["nc_pw"])
         self.booth = PhotoBooth.PhotoBooth(working_dictonary,
                                            self.settings["montage_style"],
